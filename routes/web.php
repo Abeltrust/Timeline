@@ -1,0 +1,115 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TimelineController;
+use App\Http\Controllers\CulturalHubController;
+use App\Http\Controllers\VaultController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\CommunityPostController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\DiscoverController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\LiveStreamController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+
+
+//  Public routes
+Route::get('/', [TimelineController::class, 'index'])->name('timeline.index');
+Route::get('/cultural-hub', [CulturalHubController::class, 'index'])->name('cultural-hub.index');
+//Route::get('/cultural-hub/{culture}', [CulturalHubController::class, 'show'])->name('cultural-hub.show');
+Route::get('/discover', [DiscoverController::class, 'index'])->name('discover.index');
+
+
+//  Auth routes
+require __DIR__.'/auth.php';
+
+
+Route::get('/login', function () {
+    return view('auth.login');   // looks for resources/views/login.blade.php
+})->name('login');
+
+// Register page (from Blade view)
+Route::get('/register', function () {
+    return view('auth.register');   // looks for resources/views/register.blade.php
+})->name('register');
+
+
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+//  Protected routes (require login)
+Route::middleware('auth')->group(function () {
+    // Timeline
+    Route::post('/timeline', [TimelineController::class, 'store'])->name('timeline.store');
+    Route::post('/timeline/{post}/tap', [TimelineController::class, 'tap'])->name('posts.tap');
+    Route::post('/timeline/{post}/checkin', [TimelineController::class, 'checkin'])->name('posts.checkin');
+    Route::post('/timeline/{post}/resonance', [TimelineController::class, 'resonance'])->name('timeline.resonance');
+
+
+    // Cultural Hub
+    Route::get('/cultural-hub/create', [CulturalHubController::class, 'create'])->name('cultural-hub.create');
+    Route::post('/cultural-hub/store', [CulturalHubController::class, 'store'])->name('cultural-hub.store');
+    Route::get('/cultural-hub/{culture}', [CulturalHubController::class, 'show'])->name('cultural-hub.show');
+    Route::post('/cultures/{culture}/lockin', [CulturalHubController::class, 'lockin'])->name('cultures.lockin');
+
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show'); // Auth user
+    Route::get('/profile/{user}', [ProfileController::class, 'showUser'])->name('profile.user'); // Other users
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile/chapters/create', [ProfileController::class, 'createChapter'])->name('profile.chapters.create');
+    Route::post('/profile/chapters', [ProfileController::class, 'storeChapter'])->name('profile.chapters.store');
+     Route::post('/profile/photo', [ProfileController::class, 'photo'])->name('profile.photo.upload');
+    Route::get('/settings/{id}', [ProfileController::class, 'settings'])->name('settings.index');
+    Route::patch('/settings/{id}', [ProfileController::class, 'updateSettings'])->name('settings.update');
+    
+
+    // Vault
+    Route::resource('vault', VaultController::class);
+    Route::get('/vault/{vaultItem}/download', [VaultController::class, 'download'])->name('vault.download');
+
+    // Events
+    Route::resource('events', EventController::class);
+    Route::post('/events/{event}/join', [EventController::class, 'join'])->name('events.join');
+    Route::delete('/events/{event}/leave', [EventController::class, 'leave'])->name('events.leave');
+
+    // Communities
+    Route::resource('communities', CommunityController::class);
+    Route::post('/communities/{community}/join', [CommunityController::class, 'join'])->name('communities.join');
+    Route::delete('/communities/{community}/leave', [CommunityController::class, 'leave'])->name('communities.leave');
+    Route::post('/communities/{community}/posts', [CommunityPostController::class, 'store'])->name('communities.posts.store');
+    Route::put('/communities/{community}/posts/{post}', [CommunityPostController::class, 'update'])->name('communities.posts.update');
+    Route::delete('/communities/{community}/posts/{post}', [CommunityPostController::class, 'destroy'])->name('communities.posts.destroy');
+
+    //comment
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Messages
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{conversation}', [MessageController::class, 'store'])->name('messages.store');
+    Route::get('/messages/start/{user}', [MessageController::class, 'startConversation'])->name('messages.start');
+
+    // Analytics
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+     Route::get('/live-stream', [LiveStreamController::class, 'index'])->name('live-stream.index');
+    Route::post('/live-stream', [LiveStreamController::class, 'store'])->name('live-stream.store');
+    Route::post('/live-stream/{stream}/end', [LiveStreamController::class, 'end'])->name('live-stream.end');
+    
+});
