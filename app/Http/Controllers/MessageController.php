@@ -41,6 +41,7 @@ class MessageController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'avatar' => $user->avatar,
+                    'profile_photo_url' => $user->profile_photo_url,
                     'status' => $user->is_online ? 'online' : 'offline',
                     'last_seen' => $user->last_seen,
                     'last_message' => $lastMsg?->content ?? '',

@@ -56,9 +56,7 @@ class ProfileController extends Controller
     public function showUser($user)
     {
         $user = User::withCount([
-            'stories',
-            'lockedIns',
-            'taps',
+            'posts',
             'lifeChapters'
         ])
             ->with('lifeChapters')
@@ -66,7 +64,15 @@ class ProfileController extends Controller
             ->orWhere('username', $user) // optional if you have usernames
             ->firstOrFail();
 
-        return view('profile.show', compact('user'));
+        $isLockedIn = false;
+        $hasVibed = false;
+
+        if (auth()->check()) {
+            $isLockedIn = auth()->user()->hasLockedIn($user);
+            $hasVibed = auth()->user()->hasTapped($user);
+        }
+
+        return view('profile.index', compact('user', 'isLockedIn', 'hasVibed'));
     }
 
     public function edit(Request $request): Response
@@ -182,5 +188,92 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+    public function tap(User $user)
+    {
+        $authUser = Auth::user();
+
+        // Cannot tap yourself
+        if ($authUser->id === $user->id) {
+            return response()->json(['error' => 'Cannot tap yourself'], 400);
+        }
+
+        $interaction = $authUser->interactions()
+            ->where('interactable_type', User::class)
+            ->where('interactable_id', $user->id)
+            ->where('type', 'tap')
+            ->first();
+
+        if ($interaction) {
+            $interaction->delete();
+            $user->decrement('taps_received');
+            $tapped = false;
+        } else {
+            $authUser->interactions()->create([
+                'interactable_type' => User::class,
+                'interactable_id' => $user->id,
+                'type' => 'tap',
+            ]);
+            $user->increment('taps_received');
+            $tapped = true;
+
+            // Create notification
+            $user->notifications()->create([
+                'from_user_id' => $authUser->id,
+                'type' => 'tap',
+                'title' => 'New Profile Vibe',
+                'message' => $authUser->name . ' vibed with your profile',
+                'data' => ['user_id' => $authUser->id],
+            ]);
+        }
+
+        return response()->json([
+            'tapped' => $tapped,
+            'count' => $user->fresh()->taps_received,
+        ]);
+    }
+
+    public function lockin(User $user)
+    {
+        $authUser = Auth::user();
+
+        // Cannot lockin yourself
+        if ($authUser->id === $user->id) {
+            return response()->json(['error' => 'Cannot lock-in yourself'], 400);
+        }
+
+        $interaction = $authUser->interactions()
+            ->where('interactable_type', User::class)
+            ->where('interactable_id', $user->id)
+            ->where('type', 'lockin')
+            ->first();
+
+        if ($interaction) {
+            $interaction->delete();
+            $user->decrement('locked_in_count');
+            $lockedIn = false;
+        } else {
+            $authUser->interactions()->create([
+                'interactable_type' => User::class,
+                'interactable_id' => $user->id,
+                'type' => 'lockin',
+            ]);
+            $user->increment('locked_in_count');
+            $lockedIn = true;
+
+            // Create notification
+            $user->notifications()->create([
+                'from_user_id' => $authUser->id,
+                'type' => 'lockin',
+                'title' => 'New Connection',
+                'message' => $authUser->name . ' locked-in with you',
+                'data' => ['user_id' => $authUser->id],
+            ]);
+        }
+
+        return response()->json([
+            'lockedIn' => $lockedIn,
+            'count' => $user->fresh()->locked_in_count,
+        ]);
     }
 }

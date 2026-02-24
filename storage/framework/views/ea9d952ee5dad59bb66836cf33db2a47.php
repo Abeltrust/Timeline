@@ -58,9 +58,9 @@
                 </a>
             </div>
 
-            <!-- Center: Search Bar -->
+            <!-- Center: Search Bar (Hidden on Mobile) -->
             <?php if(auth()->guard()->check()): ?>
-            <div class="flex-1 max-w-2xl mx-auto flex items-center">
+            <div class="hidden md:flex flex-1 max-w-2xl mx-auto items-center">
                 <div class="relative w-full">
                     <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-stone-400"></i>
                     <input type="text" placeholder="Search..." 
@@ -70,8 +70,15 @@
             <?php endif; ?>
 
             <!-- Right: Icons & User Menu -->
-            <div class="flex items-center space-x-1 sm:space-x-2 md:space-x-4 flex-shrink-0">
+            <div class="flex items-center space-x-2 md:space-x-4 flex-shrink-0 ml-auto">
                     <?php if(auth()->guard()->check()): ?>
+                        <!-- Create Post Button (Desktop Header) -->
+                        <button onclick="document.getElementById('createPostModal').classList.remove('hidden'); document.getElementById('createPostModal').classList.add('flex');"
+                            class="hidden md:flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-sm hover:shadow hover:scale-105 transition-all duration-200"
+                            title="Create Post">
+                            <i data-lucide="plus" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                        </button>
+
                         <!-- Live Button -->
                         <a href="<?php echo e(route('live-stream.index')); ?>" 
                         class="w-8 h-8 sm:w-9 sm:h-9 relative p-1.5 sm:p-2 text-stone-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-200" 
@@ -118,7 +125,7 @@
     </header>
 
     <div class="flex">
-        <aside class="hidden md:block md:fixed md:left-0 md:top-16 md:w-20 md:h-[calc(100vh-4rem)] md:bg-white md:border-r md:border-stone-200 md:overflow-y-auto">
+        <aside class="hidden md:block md:fixed md:left-0 md:top-16 md:w-20 md:h-[calc(100vh-4rem)] md:bg-white md:border-r md:border-stone-200 md:overflow-y-auto md:overflow-x-hidden scrollbar-hide">
             <div class="p-4">
                 <!-- Main Navigation -->
                 <nav class="space-y-3">
@@ -139,19 +146,16 @@
                         <?php if(!isset($item['auth']) || auth()->check()): ?>
                         <div class="relative group">
                             <a href="<?php echo e(route($item['route'])); ?>" 
+                               x-data
+                               @mouseenter="$dispatch('show-tooltip', { text: '<?php echo e($item['tooltip']); ?>', x: $el.getBoundingClientRect().right + 12, y: $el.getBoundingClientRect().top + ($el.offsetHeight / 2) })"
+                               @mouseleave="$dispatch('hide-tooltip')"
                             class="w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-200 <?php echo e(request()->routeIs($item['route']) ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-800'); ?>">
                                 <i data-lucide="<?php echo e($item['icon']); ?>" class="w-5 h-5"></i>
                             </a>
-                            
-                            <!-- Tooltip -->
-                            <div class="absolute left-16 top-1/2 transform -translate-y-1/2 bg-stone-800 text-white px-3 py-2 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                                <?php echo e($item['tooltip']); ?>
-
-                                <div class="absolute left-0 top-1/2 transform -translate-x-1 -translate-y-1/2 w-2 h-2 bg-stone-800 rotate-45"></div>
-                            </div>
                         </div>
                         <?php endif; ?>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
                 </nav>
 
                 <!-- Secondary Navigation -->
@@ -168,14 +172,12 @@
                         <?php $__currentLoopData = $secondaryItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="relative group">
                             <a href="<?php echo e(route($item['route'], $item['params'])); ?>" 
+                               x-data
+                               @mouseenter="$dispatch('show-tooltip', { text: '<?php echo e($item['tooltip']); ?>', x: $el.getBoundingClientRect().right + 12, y: $el.getBoundingClientRect().top + ($el.offsetHeight / 2) })"
+                               @mouseleave="$dispatch('hide-tooltip')"
                             class="w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-200 <?php echo e(request()->routeIs($item['route']) ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-800'); ?>">
                                 <i data-lucide="<?php echo e($item['icon']); ?>" class="w-5 h-5"></i>
                             </a>
-                            <div class="absolute left-16 top-1/2 transform -translate-y-1/2 bg-stone-800 text-white px-3 py-2 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                                <?php echo e($item['tooltip']); ?>
-
-                                <div class="absolute left-0 top-1/2 transform -translate-x-1 -translate-y-1/2 w-2 h-2 bg-stone-800 rotate-45"></div>
-                            </div>
                         </div>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </nav>
@@ -184,12 +186,12 @@
 
                 <!-- Brand Section -->
                 <div class="mt-6 pt-4">
-                    <div class="relative group">
-                        <div class="absolute left-16 top-1/2 transform -translate-y-1/2 bg-stone-800 text-white px-3 py-2 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 w-64">
-                            <div class="font-semibold mb-1">Your Story Matters</div>
-                            <div class="text-xs">Timeline preserves your authentic journey through Cultugraph integration</div>
-                            <div class="absolute left-0 top-1/2 transform -translate-x-1 -translate-y-1/2 w-2 h-2 bg-stone-800 rotate-45"></div>
-                        </div>
+                    <div 
+                         x-data
+                         @mouseenter="$dispatch('show-tooltip', { text: 'Timeline preserves your authentic journey', x: $el.getBoundingClientRect().right + 12, y: $el.getBoundingClientRect().top + ($el.offsetHeight / 2) })"
+                         @mouseleave="$dispatch('hide-tooltip')"
+                         class="w-12 h-12 flex items-center justify-center rounded-xl bg-stone-100 text-stone-400 cursor-help">
+                         <i data-lucide="activity" class="w-5 h-5"></i>
                     </div>
                     <?php if(auth()->guard()->guest()): ?>
                     <a href="<?php echo e(route('register')); ?>" class="mt-3 w-12 h-8 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all duration-200 flex items-center justify-center font-medium">
@@ -205,6 +207,19 @@
         <main class="flex-1 pt-16 md:ml-20 <?php echo e((request()->routeIs('messages.*')) ? 'pb-0' : 'pb-16'); ?> md:pb-0">
             <?php echo $__env->yieldContent('content'); ?>
         </main>
+    </div>
+
+    <!-- Global Tooltip (AlpineJS) -->
+    <div x-data="{ tooltipVisible: false, tooltipText: '', tooltipX: 0, tooltipY: 0 }"
+         <?php echo $__env->yieldSection(); ?>-tooltip.window="tooltipVisible = true; tooltipText = $event.detail.text; tooltipX = $event.detail.x; tooltipY = $event.detail.y"
+         @hide-tooltip.window="tooltipVisible = false"
+         x-show="tooltipVisible"
+         x-transition.opacity.duration.200ms
+         class="fixed z-[100] bg-stone-800 text-white px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap pointer-events-none shadow-lg"
+         x-bind:style="`left: ${tooltipX}px; top: ${tooltipY}px; transform: translateY(-50%)`"
+         x-cloak>
+        <span x-text="tooltipText"></span>
+        <div class="absolute left-0 top-1/2 transform -translate-x-1 -translate-y-1/2 w-2 h-2 bg-stone-800 rotate-45"></div>
     </div>
 
     <!-- Mobile Bottom Nav with Scroll Toggle (Mobile First) -->
@@ -240,10 +255,22 @@
             <i data-lucide="compass" class="w-6 h-6"></i>
             <span class="text-xs">Discover</span>
         </a>
+
+        <!-- Create Post Button (Mobile) -->
+        <?php if(auth()->guard()->check()): ?>
+        <button onclick="document.getElementById('createPostModal').classList.remove('hidden'); document.getElementById('createPostModal').classList.add('flex');" 
+            class="flex flex-col items-center justify-center -mt-1 transform transition-transform hover:scale-105">
+            <div class="w-10 h-10 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-full flex items-center justify-center shadow-md border-2 border-white text-white">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+            </div>
+        </button>
+        <?php endif; ?>
+
         <a href="<?php echo e(route('cultural-hub.index')); ?>" class="flex flex-col items-center text-stone-600 hover:text-amber-600">
             <i data-lucide="globe" class="w-6 h-6"></i>
             <span class="text-xs">Hub</span>
         </a>
+        
         <a href="<?php echo e(route('communities.index')); ?>" class="flex flex-col items-center text-stone-600 hover:text-amber-600">
             <i data-lucide="users" class="w-6 h-6"></i>
             <span class="text-xs">Communities</span>

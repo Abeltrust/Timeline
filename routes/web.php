@@ -27,7 +27,7 @@ Route::get('/discover', [DiscoverController::class, 'index'])->name('discover.in
 
 
 //  Auth routes
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 Route::get('/login', function () {
@@ -60,6 +60,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/cultures/{culture}/lockin', [CulturalHubController::class, 'lockin'])->name('cultures.lockin');
 
 
+    // User Interactions
+    Route::post('/users/{user}/lockin', [ProfileController::class, 'lockin'])->name('users.lockin');
+    Route::post('/users/{user}/tap', [ProfileController::class, 'tap'])->name('users.tap');
+
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show'); // Auth user
     Route::get('/profile/{user}', [ProfileController::class, 'showUser'])->name('profile.user'); // Other users
@@ -68,10 +73,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/profile/chapters/create', [ProfileController::class, 'createChapter'])->name('profile.chapters.create');
     Route::post('/profile/chapters', [ProfileController::class, 'storeChapter'])->name('profile.chapters.store');
-     Route::post('/profile/photo', [ProfileController::class, 'photo'])->name('profile.photo.upload');
+    Route::post('/profile/photo', [ProfileController::class, 'photo'])->name('profile.photo.upload');
     Route::get('/settings/{id}', [ProfileController::class, 'settings'])->name('settings.index');
     Route::patch('/settings/{id}', [ProfileController::class, 'updateSettings'])->name('settings.update');
-    
+
 
     // Vault
     Route::resource('vault', VaultController::class);
@@ -108,8 +113,8 @@ Route::middleware('auth')->group(function () {
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 
-     Route::get('/live-stream', [LiveStreamController::class, 'index'])->name('live-stream.index');
+    Route::get('/live-stream', [LiveStreamController::class, 'index'])->name('live-stream.index');
     Route::post('/live-stream', [LiveStreamController::class, 'store'])->name('live-stream.store');
     Route::post('/live-stream/{stream}/end', [LiveStreamController::class, 'end'])->name('live-stream.end');
-    
+
 });
