@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" class="h-full">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" class="h-full overflow-x-hidden">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     
     <title><?php echo $__env->yieldContent('title', 'Timeline - Cultural Preservation Platform'); ?></title>
@@ -46,31 +46,31 @@
 </head>
 <body class="h-full bg-stone-50 antialiased">
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-sm border-b border-stone-200 z-50">
-        <div class="flex items-center justify-between h-full px-4 md:px-6">
-            <div class="flex items-center space-x-3">
+    <header class="fixed top-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-sm border-b border-stone-200 z-50 flex">
+        <div class="w-full flex items-center h-full px-4 md:px-6 gap-4">
+            <!-- Left: Logo -->
+            <div class="flex items-center space-x-3 flex-shrink-0">
                <div class="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                     <i data-lucide="book-open" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i>
                 </div>
-
                 <a href="<?php echo e(route('timeline.index')); ?>" class="text-base sm:text-xl font-bold bg-gradient-to-r from-stone-800 to-stone-600 bg-clip-text text-transparent hover:from-amber-600 hover:to-orange-600 transition-all duration-200">
                     Timeline
                 </a>
-
             </div>
 
-            <!-- Search Bar (Hidden on mobile) -->
+            <!-- Center: Search Bar -->
             <?php if(auth()->guard()->check()): ?>
-            <div class="flex-1 max-w-md mx-4 hidden sm:block">
-                <div class="relative">
+            <div class="flex-1 max-w-2xl mx-auto flex items-center">
+                <div class="relative w-full">
                     <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-stone-400"></i>
-                    <input type="text" placeholder="Search stories, cultures, people..." 
-                           class="w-full pl-10 pr-4 py-2 bg-stone-10 border-0 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all duration-200">
+                    <input type="text" placeholder="Search..." 
+                           class="w-full pl-10 pr-4 py-2 bg-stone-100 border-0 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all duration-200 text-sm">
                 </div>
             </div>
             <?php endif; ?>
 
-            <div class="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
+            <!-- Right: Icons & User Menu -->
+            <div class="flex items-center space-x-1 sm:space-x-2 md:space-x-4 flex-shrink-0">
                     <?php if(auth()->guard()->check()): ?>
                         <!-- Live Button -->
                         <a href="<?php echo e(route('live-stream.index')); ?>" 
@@ -89,21 +89,13 @@
                             <?php endif; ?>
                         </a>
 
-                        <!-- Share Story Button -->
-                        <button onclick="openCreatePostModal()" 
-                            class="flex items-center space-x-1 sm:space-x-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all duration-200 shadow-sm hover:shadow-md text-xs sm:text-sm">
-                            <i data-lucide="plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-                            <span class="hidden md:inline font-medium">Share Story</span>
-                        </button>
-
                         <!-- User Menu -->
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" 
-                                class="flex items-center space-x-1 sm:space-x-2 hover:bg-stone-100 rounded-lg p-1.5 sm:p-2 transition-colors">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                                    <span class="text-white font-semibold text-xs sm:text-sm"><?php echo e(auth()->user()->initials); ?></span>
-                                </div>
-                                <span class="hidden md:block text-sm font-medium text-stone-700"><?php echo e(auth()->user()->name); ?></span>
+                                class="flex items-center space-x-1 sm:space-x-2 hover:bg-stone-100 rounded-lg p-1 transition-colors">
+                                <img src="<?php echo e(auth()->user()->profile_photo_url); ?>" 
+                                     class="w-8 h-8 rounded-full object-cover border border-stone-200">
+                                <span class="hidden lg:block text-sm font-black text-stone-700"><?php echo e(auth()->user()->name); ?></span>
                             </button>
 
                             <div x-show="open" @click.away="open = false" x-cloak
@@ -121,6 +113,7 @@
                         <a href="<?php echo e(route('login')); ?>" class="text-sm sm:text-base text-stone-600 hover:text-stone-800 font-medium transition-colors">Sign In</a>
                     <?php endif; ?>
                 </div>
+        </div>
 
     </header>
 
@@ -209,13 +202,36 @@
 
 
         <!-- Main Content -->
-        <main class="flex-1 pt-16 md:ml-20 pb-16 md:pb-0">
+        <main class="flex-1 pt-16 md:ml-20 <?php echo e((request()->routeIs('messages.*')) ? 'pb-0' : 'pb-16'); ?> md:pb-0">
             <?php echo $__env->yieldContent('content'); ?>
         </main>
     </div>
 
-    <!-- Mobile Bottom Nav (scrollable) -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 flex space-x-6 overflow-x-auto p-2 md:hidden z-50">
+    <!-- Mobile Bottom Nav with Scroll Toggle (Mobile First) -->
+    <nav 
+        x-data="{ lastScrollTop: 0, visible: true, atTop: true }"
+        x-init="
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                atTop = scrollTop < 10;
+                if (scrollTop > lastScrollTop && scrollTop > 50) {
+                    visible = false;
+                } else {
+                    visible = true;
+                }
+                lastScrollTop = scrollTop;
+            });
+        "
+        x-show="visible"
+        x-cloak
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="translate-y-full"
+        x-transition:enter-end="translate-y-0"
+        x-transition:leave="transition ease-in duration-300 transform"
+        x-transition:leave-start="translate-y-0"
+        x-transition:leave-end="translate-y-full"
+        class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-stone-200 flex space-x-6 overflow-x-auto p-2 md:hidden z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] cursor-pointer"
+    >
         <a href="<?php echo e(route('timeline.index')); ?>" class="flex flex-col items-center text-stone-600 hover:text-amber-600">
             <i data-lucide="home" class="w-6 h-6"></i>
             <span class="text-xs">Home</span>

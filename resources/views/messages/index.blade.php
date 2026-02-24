@@ -1,103 +1,104 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex h-screen bg-gray-50">
+    <div
+        class="flex flex-col h-[100dvh] md:h-[calc(100vh-4rem)] bg-gray-100 overflow-x-hidden font-sans w-full max-w-full box-border">
 
-    <!-- LEFT COLUMN (ACTIVE USERS) -->
-    <div class="w-1/4 border-r border-gray-200 bg-white overflow-y-auto">
-        <div class="p-4 font-bold text-gray-700 border-b">Active Users</div>
+        <!-- INBOX COLUMN -->
+        <div
+            class="flex-1 flex flex-col bg-white relative h-full w-full border-x border-gray-100 shadow-sm overflow-x-hidden overflow-y-auto box-border">
 
-        @foreach($activeUsers as $user)
-            <a href="{{ route('messages.start', $user->id) }}" 
-               class="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer">
-                <div class="relative">
-                    <img src="{{ $user->avatar }}" class="w-10 h-10 rounded-full object-cover">
-                    <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full 
-                        {{ $user->status == 'online' ? 'bg-amber-400' : 'bg-gray-400' }}">
-                    </span>
-                </div>
-                <div class="flex-1">
-                    <p class="font-semibold text-gray-800">{{ $user->name }}</p>
-                    <p class="text-xs text-gray-500 truncate">{{ $user->last_message }}</p>
-                </div>
-                <div>
-                    @if($user->last_status == 'sent')
-                        <i data-lucide="check" class="w-4 h-4 text-gray-400"></i>
-                    @elseif($user->last_status == 'read')
-                        <i data-lucide="check-check" class="w-4 h-4 text-amber-500"></i>
-                    @endif
-                </div>
-            </a>
-        @endforeach
-    </div>
-
-    <!-- RIGHT COLUMN (CHAT) -->
-    <div class="flex-1 flex flex-col">
-
-        @if($selectedConversation)
-            @php
-                $otherUser = $selectedConversation->participants
-                    ->where('id', '!=', auth()->id())
-                    ->first();
-            @endphp
-
-            <!-- CHAT HEADER -->
-            <div class="flex items-center justify-between p-4 border-b bg-white">
-                <div class="flex items-center gap-3">
-                    <img src="{{ $otherUser->avatar ?? '' }}" class="w-10 h-10 rounded-full object-cover">
-                    <div>
-                        <p class="font-semibold text-gray-800">{{ $otherUser->name ?? 'Unknown' }}</p>
-                        <p class="text-xs text-gray-500">
-                            {{ $otherUser->is_online ? 'Online' : 'Last seen ' . $otherUser->last_seen->diffForHumans() }}
-                        </p>
-                    </div>
-                </div>
-                <div class="flex gap-4">
-                    <i data-lucide="phone" class="w-5 h-5 text-gray-600 cursor-pointer"></i>
-                    <i data-lucide="video" class="w-5 h-5 text-gray-600 cursor-pointer"></i>
+            <!-- HEADER -->
+            <div
+                class="p-2 md:p-4 flex items-center justify-between border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+                <h1 class="text-lg md:text-2xl font-black text-gray-900 tracking-tight truncate">Messages</h1>
+                <div
+                    class="p-1.5 md:p-2 bg-amber-50 rounded-full text-amber-600 cursor-pointer hover:bg-amber-100 transition-colors">
+                    <i data-lucide="message-square-plus" class="w-5 h-5 md:w-6 md:h-6"></i>
                 </div>
             </div>
 
-            <!-- CHAT MESSAGES -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-100">
-                @foreach($messages as $msg)
-                    <div class="flex {{ $msg->user_id == auth()->id() ? 'justify-end' : 'justify-start' }}">
-                        <div class="max-w-xs px-4 py-2 rounded-2xl 
-                            {{ $msg->user_id == auth()->id() ? 'bg-amber-400 text-white rounded-br-none' : 'bg-white text-gray-800 rounded-bl-none' }}">
-                            <p>{{ $msg->content }}</p>
-                            <div class="flex justify-end mt-1 space-x-1 text-xs text-gray-600">
-                                <span>{{ $msg->created_at->format('H:i') }}</span>
-                                @if($msg->user_id == auth()->id())
-                                    @if($msg->status == 'sent')
-                                        <i data-lucide="check" class="w-4 h-4"></i>
-                                    @elseif($msg->status == 'read')
-                                        <i data-lucide="check-check" class="w-4 h-4 text-amber-600"></i>
-                                    @endif
+            <!-- SEARCH -->
+            <div class="p-2 border-b border-gray-50">
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                    <input type="text" placeholder="Search..."
+                        class="w-full pl-8 pr-2 py-1 bg-gray-50 border-0 rounded-xl text-xs md:text-sm truncate focus:ring-2 focus:ring-amber-500 transition-all box-border">
+                </div>
+            </div>
+
+            <!-- USER LIST -->
+            <div class="flex-1 overflow-y-auto space-y-1 p-1 md:p-2.5 custom-scrollbar box-border">
+                <div class="px-2 py-1 text-xs font-bold text-gray-400 uppercase tracking-widest truncate">Active
+                    Conversations</div>
+
+                @forelse($activeUsers as $user)
+                    <a href="{{ route('messages.start', $user->id) }}"
+                        class="group flex items-center gap-2 p-2 md:p-3 rounded-xl transition-all duration-200 hover:bg-amber-50 hover:shadow-md hover:shadow-amber-100/50 min-w-0">
+
+                        <div class="relative flex-shrink-0">
+                            <img src="{{ $user->profile_photo_url }}"
+                                class="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform">
+                            <span class="absolute -bottom-1 -right-1 w-3 h-3 md:w-4 md:h-4 rounded-full border-2 border-white 
+                                    {{ $user->status == 'online' ? 'bg-green-500' : 'bg-gray-300' }}">
+                            </span>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-baseline mb-0.5">
+                                <h3 class="font-extrabold text-gray-900 truncate text-sm md:text-base">{{ $user->name }}</h3>
+                                <span
+                                    class="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-tighter truncate">
+                                    {{ $user->last_seen ? $user->last_seen->diffForHumans(null, true) : '' }}
+                                </span>
+                            </div>
+                            <p class="text-xs md:text-sm text-gray-500 truncate leading-snug font-medium max-w-[70%]">
+                                {{ $user->last_message ? Str::limit($user->last_message, 30) : 'Start a new conversation' }}
+                            </p>
+                        </div>
+
+                        @if($user->last_status)
+                            <div class="flex-shrink-0">
+                                @if($user->last_status == 'sent')
+                                    <i data-lucide="check" class="w-3 h-3 md:w-4 md:h-4 text-gray-300"></i>
+                                @elseif($user->last_status == 'read' || $user->last_status == 'delivered')
+                                    <i data-lucide="check-check"
+                                        class="w-3 h-3 md:w-4 md:h-4 {{ $user->last_status == 'read' ? 'text-amber-500' : 'text-gray-300' }}"></i>
                                 @endif
                             </div>
-                        </div>
+                        @endif
+
+                    </a>
+                @empty
+                    <div
+                        class="h-full flex flex-col items-center justify-center opacity-40 text-gray-400 p-8 space-y-4 truncate">
+                        <i data-lucide="ghost" class="w-12 h-12 md:w-16 md:h-16"></i>
+                        <p class="font-bold text-sm md:text-base truncate">No active users found.</p>
                     </div>
-                @endforeach
+                @endforelse
             </div>
 
-            <!-- CHAT INPUT -->
-            <form action="{{ route('messages.store', $selectedConversation->id) }}" method="POST" class="p-3 border-t bg-white flex items-center gap-3">
-                @csrf
-                <input type="text" name="content" placeholder="Type a message..."
-                    class="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring focus:ring-amber-300">
-                <button type="submit" class="bg-amber-500 text-white rounded-full p-2">
-                    <i data-lucide="send" class="w-5 h-5"></i>
-                </button>
-            </form>
-        @else
-            <div class="flex-1 flex items-center justify-center text-gray-500">
-                Select a conversation to start chatting
-            </div>
-        @endif
+        </div>
     </div>
-</div>
 
-<script>
-    lucide.createIcons();
-</script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            lucide.createIcons();
+        });
+    </script>
 @endsection

@@ -11,43 +11,63 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
      */
-        public function photo()
-        {
-            
-        }
-         public function show()
-        {
-            $user = auth()->User()->loadCount([
-              //  'stories', 
-               // 'lockedIns', 
-               // 'taps', 
-               // 'lifeChapters'
-            ])->load('lifeChapters');
+    public function photo(Request $request)
+    {
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-            return view('profile.index', compact('user'));
+        $user = Auth::user();
+
+        // Delete old avatar if exists
+        if ($user->avatar && Storage::exists('public/avatars/' . $user->avatar)) {
+            Storage::delete('public/avatars/' . $user->avatar);
         }
 
-        public function showUser($user)
-        {
-            $user = User::withCount([
-                    'stories', 
-                    'lockedIns', 
-                    'taps', 
-                    'lifeChapters'
-                ])
-                ->with('lifeChapters')
-                ->where('id', $user)
-                ->orWhere('username', $user) // optional if you have usernames
-                ->firstOrFail();
+        $avatarName = time() . '.' . $request->profile_photo->extension();
+        $request->profile_photo->storeAs('public/avatars', $avatarName);
 
-            return view('profile.show', compact('user'));
-        }
+        $user->update([
+            'avatar' => $avatarName,
+        ]);
+
+        return back()->with('success', 'Profile photo updated successfully.');
+    }
+    public function show()
+    {
+        $user = auth()->User()->loadCount([
+            //  'stories', 
+            // 'lockedIns', 
+            // 'taps', 
+            // 'lifeChapters'
+        ])->load('lifeChapters');
+
+        return view('profile.index', compact('user'));
+    }
+
+    public function showUser($user)
+    {
+        $user = User::withCount([
+            'stories',
+            'lockedIns',
+            'taps',
+            'lifeChapters'
+        ])
+            ->with('lifeChapters')
+            ->where('id', $user)
+            ->orWhere('username', $user) // optional if you have usernames
+            ->firstOrFail();
+
+        return view('profile.show', compact('user'));
+    }
 
     public function edit(Request $request): Response
     {
@@ -73,12 +93,12 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit');
     }
 
-   public function settings($id)
-{
-    $user = User::findOrFail($id);
+    public function settings($id)
+    {
+        $user = User::findOrFail($id);
 
-    return view('profile.settings', compact('user'));
-}
+        return view('profile.settings', compact('user'));
+    }
 
     public function updateSettings(Request $request, $id)
     {
@@ -89,12 +109,12 @@ class ProfileController extends Controller
             // Update basic info
             if ($request->has('name') || $request->has('email')) {
                 $request->validate([
-                    'name'  => 'required|string|max:255',
+                    'name' => 'required|string|max:255',
                     'email' => 'required|email|unique:users,email,' . $user->id,
                 ]);
 
                 $user->update([
-                    'name'  => $request->name,
+                    'name' => $request->name,
                     'email' => $request->email,
                 ]);
             }
