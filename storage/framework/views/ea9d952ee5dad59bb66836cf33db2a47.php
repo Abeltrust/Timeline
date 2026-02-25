@@ -29,7 +29,7 @@
             document.documentElement.classList.remove('dark');
         }
     </script>
-
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
