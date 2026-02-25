@@ -11,6 +11,7 @@ class CulturalHubController extends Controller
     public function index(Request $request)
     {
         $category = $request->get('category', 'all');
+        $search = $request->get('search');
 
         $query = Culture::with(['submitter', 'lockIns', 'resonances'])
             ->where(function ($q) {
@@ -19,14 +20,21 @@ class CulturalHubController extends Controller
                 if (Auth::check()) {
                     $q->orWhere('submitted_by', Auth::id());
                 }
-            })
-            ->inRandomOrder();
+            });
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('region', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
 
         if ($category !== 'all') {
             $query->where('category', $category);
         }
 
-        $cultures = $query->paginate(12);
+        $cultures = $query->inRandomOrder()->paginate(12);
 
         $categories = [
             'all' => 'All Cultures',
@@ -39,6 +47,42 @@ class CulturalHubController extends Controller
         ];
 
         return view('cultural-hub.index', compact('cultures', 'categories', 'category'));
+    }
+
+    public function edit(Culture $culture)
+    {
+        if ($culture->submitted_by !== Auth::id()) {
+            abort(403, 'You are not the guardian of this story.');
+        }
+
+        $categories = [
+            'Traditional Crafts',
+            'Oral Traditions',
+            'Music & Dance',
+            'Culinary Heritage',
+            'Religious Practices',
+            'Festivals & Ceremonies',
+            'Language & Literature',
+            'Architecture & Design',
+            'Agricultural Practices',
+            'Healing Traditions',
+            'Social Customs',
+            'Art & Aesthetics',
+            'Games & Sports',
+            'Clothing & Textiles'
+        ];
+
+        $licenses = [
+            'Public Domain',
+            'CC0 (Creative Commons Zero)',
+            'CC BY (Attribution)',
+            'CC BY-SA (Attribution-ShareAlike)',
+            'CC BY-NC (Attribution-NonCommercial)',
+            'CC BY-ND (Attribution-NoDerivs)',
+            'All Rights Reserved'
+        ];
+
+        return view('cultural-hub.edit', compact('culture', 'categories', 'licenses'));
     }
 
     public function show(Culture $culture)
@@ -111,7 +155,7 @@ class CulturalHubController extends Controller
             return back()->withInput()->withErrors(['description' => 'Description must be at least 20 words to ensure quality.']);
         }
 
-        $culture = new Culture($request->except(['video_file', 'audio_file', 'images']));
+        $culture = new Culture($request->except(['video_file', 'audio_file', 'images', 'image']));
         $culture->submitted_by = Auth::id();
         $culture->status = 'pending_review';
 
@@ -151,6 +195,69 @@ class CulturalHubController extends Controller
 
         return redirect()->route('cultural-hub.index')
             ->with('success', 'Culture submitted successfully! It will be reviewed before publication.');
+    }
+
+    public function update(Request $request, Culture $culture)
+    {
+        if ($culture->submitted_by !== Auth::id()) {
+            abort(403, 'You are not the guardian of this story.');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'region' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category' => 'required|string',
+            'image' => 'nullable|image|max:10240',
+            'images.*' => 'nullable|image|max:10240',
+            'video_url' => 'nullable|url',
+            'video_description' => 'nullable|string|max:1000',
+            'audio_url' => 'nullable|url',
+            'audio_description' => 'nullable|string|max:1000',
+            'license_type' => 'nullable|string',
+            'license_credit' => 'nullable|string|max:255',
+        ]);
+
+        $culture->fill($request->except(['video_file', 'audio_file', 'images', 'image']));
+
+        // Process Video Embed URL
+        if ($request->video_url && $request->video_url !== $culture->getOriginal('video_url')) {
+            $culture->video_url = $this->convertToEmbedUrl($request->video_url);
+        }
+
+        // Handle Primary Image with optimization
+        if ($request->hasFile('image')) {
+            $culture->image = $this->optimizeAndStore($request->file('image'), 'cultures');
+        }
+
+        // Handle Multiple Gallery Images (Max 5)
+        if ($request->hasFile('images')) {
+            $gallery = [];
+            foreach (array_slice($request->file('images'), 0, 5) as $file) {
+                $gallery[] = $this->optimizeAndStore($file, 'cultures/gallery');
+            }
+            $culture->media_files = $gallery;
+        }
+
+        $culture->save();
+
+        return redirect()->route('cultural-hub.show', $culture->id)
+            ->with('success', 'Legend updated successfully.');
+    }
+
+    public function destroy(Culture $culture)
+    {
+        if ($culture->submitted_by !== Auth::id()) {
+            abort(403, 'You cannot dissolve a story you did not enshrine.');
+        }
+
+        $culture->delete();
+
+        // Optional: decrement the count
+        Auth::user()->decrement('cultures_contributed');
+
+        return redirect()->route('cultural-hub.index')
+            ->with('success', 'The story has been dissolved into the mists of time.');
     }
 
     private function convertToEmbedUrl($url)

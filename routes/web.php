@@ -54,8 +54,11 @@ Route::middleware('auth')->group(function () {
 
     // Cultural Hub
     Route::get('/cultural-hub/create', [CulturalHubController::class, 'create'])->name('cultural-hub.create');
+    Route::get('/cultural-hub/{culture}/edit', [CulturalHubController::class, 'edit'])->name('cultural-hub.edit');
     Route::post('/cultural-hub/store', [CulturalHubController::class, 'store'])->name('cultural-hub.store');
-    Route::post('/cultures/{culture}/lockin', [CulturalHubController::class, 'lockin'])->name('cultures.lockin');
+    Route::put('/cultural-hub/{culture}', [CulturalHubController::class, 'update'])->name('cultural-hub.update');
+    Route::delete('/cultural-hub/{culture}', [CulturalHubController::class, 'destroy'])->name('cultural-hub.destroy');
+    Route::post('/cultural-hub/{culture}/lock-in', [CulturalHubController::class, 'lockin'])->name('cultural-hub.lock-in');
 
 
     // User Interactions
