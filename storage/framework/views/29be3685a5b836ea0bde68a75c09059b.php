@@ -41,7 +41,7 @@
                                 class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">Culture
                                 Name</label>
                             <input type="text" name="name" id="name" required
-                                class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4 <?php $__errorArgs = ['name'];
+                                class="w-full stnd-input py-3 px-4 <?php $__errorArgs = ['name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -65,7 +65,7 @@ unset($__errorArgs, $__bag); ?>
                             <label for="region"
                                 class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">Region/Origin</label>
                             <input type="text" name="region" id="region" required
-                                class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4 <?php $__errorArgs = ['region'];
+                                class="w-full stnd-input py-3 px-4 <?php $__errorArgs = ['region'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -90,7 +90,7 @@ unset($__errorArgs, $__bag); ?>
                         <label for="category"
                             class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">Category</label>
                         <select name="category" id="category" required
-                            class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4 appearance-none cursor-pointer">
+                            class="w-full stnd-input py-3 px-4 appearance-none cursor-pointer">
                             <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($cat); ?>"><?php echo e($cat); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -99,11 +99,11 @@ unset($__errorArgs, $__bag); ?>
 
                     <!-- Description -->
                     <div x-data="{ 
-                                content: '<?php echo e(old('description')); ?>',
-                                wordCount() {
-                                    return this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
-                                }
-                            }">
+                                        content: '<?php echo e(old('description')); ?>',
+                                        wordCount() {
+                                            return this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
+                                        }
+                                    }">
                         <label for="description"
                             class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2 flex justify-between">
                             <span>Core Story / Description</span>
@@ -113,7 +113,7 @@ unset($__errorArgs, $__bag); ?>
                             </span>
                         </label>
                         <textarea name="description" id="description" rows="5" required x-model="content"
-                            class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-4 px-4 <?php $__errorArgs = ['description'];
+                            class="w-full stnd-input py-4 px-4 <?php $__errorArgs = ['description'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -173,13 +173,11 @@ unset($__errorArgs, $__bag); ?>
                         <label for="video_url"
                             class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">External
                             Video URL</label>
-                        <input type="url" name="video_url" id="video_url"
-                            class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4"
+                        <input type="url" name="video_url" id="video_url" class="w-full stnd-input py-3 px-4"
                             placeholder="YouTube or Vimeo link...">
                     </div>
 
-                    <textarea name="video_description" rows="2"
-                        class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4 text-sm"
+                    <textarea name="video_description" rows="2" class="w-full stnd-input py-3 px-4 text-sm"
                         placeholder="Tell us what makes this video special..."></textarea>
                 </div>
 
@@ -222,13 +220,11 @@ unset($__errorArgs, $__bag); ?>
                         <label for="audio_url"
                             class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">External
                             Audio URL</label>
-                        <input type="url" name="audio_url" id="audio_url"
-                            class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4"
+                        <input type="url" name="audio_url" id="audio_url" class="w-full stnd-input py-3 px-4"
                             placeholder="SoundCloud or Podcast link...">
                     </div>
 
-                    <textarea name="audio_description" rows="2"
-                        class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4 text-sm"
+                    <textarea name="audio_description" rows="2" class="w-full stnd-input py-3 px-4 text-sm"
                         placeholder="Tell us about this sound recording..."></textarea>
                 </div>
 
@@ -241,18 +237,68 @@ unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                        <div>
-                            <label class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">Cover
-                                Gallery Highlight</label>
-                            <div
-                                class="border-2 border-amber-200 border-dashed rounded-2xl p-6 text-center hover:border-amber-400 transition-colors">
-                                <input id="image" name="image" type="file" class="hidden" accept="image/*"
-                                    x-on:change="$refs.iLabel.innerText = $el.files[0].name">
-                                <label for="image" class="cursor-pointer group">
-                                    <i data-lucide="image"
-                                        class="w-8 h-8 text-amber-400 mx-auto mb-2 group-hover:scale-110 transition-transform"></i>
-                                    <p class="text-[10px] font-black text-stone-600" x-ref="iLabel">SELECT COVER IMAGE</p>
+                        <div class="grid grid-cols-1 gap-8 items-start" x-data="{ 
+                            galleryPreviews: [],
+                            handleGallery(e) {
+                                const files = Array.from(e.target.files).slice(0, 5);
+                                this.galleryPreviews = [];
+                                files.forEach(file => {
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => this.galleryPreviews.push(e.target.result);
+                                    reader.readAsDataURL(file);
+                                });
+                            }
+                        }">
+                            <!-- Cover Image -->
+                            <div>
+                                <label
+                                    class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">Primary
+                                    Cover Image</label>
+                                <div
+                                    class="border-2 border-amber-200 border-dashed rounded-2xl p-6 text-center hover:border-amber-400 transition-colors bg-amber-50/10">
+                                    <input id="image" name="image" type="file" class="hidden" accept="image/*"
+                                        x-on:change="$refs.iLabel.innerText = $el.files[0].name">
+                                    <label for="image" class="cursor-pointer group">
+                                        <i data-lucide="image"
+                                            class="w-8 h-8 text-amber-400 mx-auto mb-2 group-hover:scale-110 transition-transform"></i>
+                                        <p class="text-[10px] font-black text-stone-600 uppercase" x-ref="iLabel">Select
+                                            Story Cover</p>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Gallery Images -->
+                            <div class="pt-6 border-t border-stone-100">
+                                <label
+                                    class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2 flex justify-between">
+                                    <span>Visual Gallery (Up to 5 Images)</span>
+                                    <span class="text-amber-600" x-text="galleryPreviews.length + '/5'"></span>
                                 </label>
+                                <div
+                                    class="border-2 border-stone-200 border-dashed rounded-2xl p-6 text-center hover:border-amber-400 transition-colors">
+                                    <input id="images" name="images[]" type="file" class="hidden" accept="image/*" multiple
+                                        @change="handleGallery">
+                                    <label for="images" class="cursor-pointer group">
+                                        <i data-lucide="layout-grid"
+                                            class="w-8 h-8 text-stone-300 mx-auto mb-2 group-hover:text-amber-400 transition-colors"></i>
+                                        <p class="text-[10px] font-black text-stone-500 uppercase">Add Gallery Photos</p>
+                                    </label>
+                                </div>
+
+                                <!-- Gallery Previews -->
+                                <div class="grid grid-cols-5 gap-2 mt-4" x-show="galleryPreviews.length > 0">
+                                    <template x-for="(src, index) in galleryPreviews" :key="index">
+                                        <div
+                                            class="aspect-square rounded-lg overflow-hidden border border-stone-200 bg-stone-50 relative group">
+                                            <img :src="src" class="w-full h-full object-cover">
+                                            <div
+                                                class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <span class="text-white text-[10px] font-bold"
+                                                    x-text="'#' + (index + 1)"></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                         <div class="space-y-4">
@@ -261,7 +307,7 @@ unset($__errorArgs, $__bag); ?>
                                     class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2 font-bold">License
                                     Type</label>
                                 <select name="license_type" id="license_type"
-                                    class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4 text-sm font-bold appearance-none cursor-pointer">
+                                    class="w-full stnd-input py-3 px-4 text-sm font-bold appearance-none cursor-pointer">
                                     <?php $__currentLoopData = $licenses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $license): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <option value="<?php echo e($license); ?>"><?php echo e($license); ?></option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -272,7 +318,7 @@ unset($__errorArgs, $__bag); ?>
                                     class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2 font-bold">Attribution
                                     / Credit</label>
                                 <input type="text" name="license_credit" id="license_credit"
-                                    class="w-full border-amber-200 rounded-2xl focus:ring-amber-500 focus:border-amber-500 py-3 px-4 text-sm font-medium"
+                                    class="w-full stnd-input py-3 px-4 text-sm font-medium"
                                     placeholder="e.g. Photo by John Doe, Archives of Maasai...">
                             </div>
                         </div>

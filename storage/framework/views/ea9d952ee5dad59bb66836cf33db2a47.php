@@ -19,6 +19,20 @@
     <style>
         [x-cloak] { display: none !important; }
         body { font-family: 'Inter', sans-serif; }
+        
+        /* Mobile footprint reduction */
+        @media (max-width: 640px) {
+            html { font-size: 13px; }
+            .h-16 { @apply h-14; } /* Tighter header */
+            .p-8 { @apply p-6; }
+            .p-10 { @apply p-7; }
+            .gap-8 { @apply gap-4; }
+        }
+
+        /* Standardized Input Styling */
+        .stnd-input {
+            @apply rounded-xl border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder-stone-400;
+        }
     </style>
     
     <script>
@@ -74,7 +88,7 @@
                 <div class="relative w-full">
                     <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-stone-400"></i>
                     <input type="text" placeholder="Search..." 
-                           class="w-full pl-10 pr-4 py-2 bg-stone-100 border-0 rounded-lg focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all duration-200 text-sm">
+                           class="w-full pl-10 pr-4 py-2 stnd-input bg-stone-100 focus:bg-white transition-all duration-200 text-sm">
                 </div>
             </div>
             <?php endif; ?>
@@ -232,72 +246,54 @@
         <div class="absolute left-0 top-1/2 transform -translate-x-1 -translate-y-1/2 w-2 h-2 bg-stone-800 rotate-45"></div>
     </div>
 
-    <!-- Mobile Bottom Nav with Scroll Toggle (Mobile First) -->
-    <nav 
-        x-data="{ lastScrollTop: 0, visible: true, atTop: true }"
-        x-init="
-            window.addEventListener('scroll', () => {
-                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                atTop = scrollTop < 10;
-                if (scrollTop > lastScrollTop && scrollTop > 50) {
-                    visible = false;
-                } else {
-                    visible = true;
-                }
-                lastScrollTop = scrollTop;
-            });
-        "
-        x-show="visible"
-        x-cloak
-        x-transition:enter="transition ease-out duration-300 transform"
-        x-transition:enter-start="translate-y-full"
-        x-transition:enter-end="translate-y-0"
-        x-transition:leave="transition ease-in duration-300 transform"
-        x-transition:leave-start="translate-y-0"
-        x-transition:leave-end="translate-y-full"
-        class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 flex space-x-6 overflow-x-auto p-2 md:hidden z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] cursor-pointer"
-    >
-        <a href="<?php echo e(route('timeline.index')); ?>" class="flex flex-col items-center text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500">
-            <i data-lucide="home" class="w-6 h-6"></i>
-            <span class="text-xs">Home</span>
-        </a>
-        <a href="<?php echo e(route('discover.index')); ?>" class="flex flex-col items-center text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500">
-            <i data-lucide="compass" class="w-6 h-6"></i>
-            <span class="text-xs">Discover</span>
-        </a>
-
-        <!-- Create Post Button (Mobile) -->
-        <?php if(auth()->guard()->check()): ?>
-        <button onclick="document.getElementById('createPostModal').classList.remove('hidden'); document.getElementById('createPostModal').classList.add('flex');" 
-            class="flex flex-col items-center justify-center -mt-1 transform transition-transform hover:scale-105">
-            <div class="w-10 h-10 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-stone-800 text-white">
-                <i data-lucide="plus" class="w-5 h-5"></i>
-            </div>
-        </button>
-        <?php endif; ?>
-
-        <a href="<?php echo e(route('cultural-hub.index')); ?>" class="flex flex-col items-center text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500">
-            <i data-lucide="globe" class="w-6 h-6"></i>
-            <span class="text-xs">Hub</span>
-        </a>
+    <!-- Dynamic Reel Mobile Navigation (Double Gap Illusion) -->
+    <div class="fixed bottom-0 left-0 right-0 h-20 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 md:hidden z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] transition-colors duration-200">
         
-        <a href="<?php echo e(route('communities.index')); ?>" class="flex flex-col items-center text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500">
-            <i data-lucide="users" class="w-6 h-6"></i>
-            <span class="text-xs">Communities</span>
-        </a>
-        <a href="<?php echo e(route('events.index')); ?>" class="flex flex-col items-center text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500">
-            <i data-lucide="calendar" class="w-6 h-6"></i>
-            <span class="text-xs">Events</span>
-        </a>
-        <a href="<?php echo e(route('messages.index')); ?>" class="flex flex-col items-center text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500">
-            <i data-lucide="message-circle" class="w-6 h-6"></i>
-            <span class="text-xs">Messages</span>
-        </a>
-        <a href="<?php echo e(route('profile.show')); ?>" class="flex flex-col items-center text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500">
-            <i data-lucide="user" class="w-6 h-6"></i>
-            <span class="text-xs">Profile</span>
-        </a>
-    </nav>
+        <!-- Fixed Center Post Button Anchor -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-[20vw] flex items-center justify-center">
+                <?php if(auth()->guard()->check()): ?>
+                <button onclick="openCreatePostModal()" 
+                    class="pointer-events-auto flex flex-col items-center justify-center -mt-10 bg-gradient-to-tr from-amber-500 to-orange-600 w-16 h-16 rounded-full shadow-lg border-4 border-white dark:border-stone-900 text-white transform active:scale-95 transition-all z-[60]">
+                    <i data-lucide="plus" class="w-8 h-8"></i>
+                </button>
+                <?php else: ?>
+                <a href="<?php echo e(route('login')); ?>" class="pointer-events-auto flex flex-col items-center justify-center text-stone-600 dark:text-stone-400">
+                    <i data-lucide="log-in" class="w-7 h-7"></i>
+                    <span class="text-[11px] mt-1 font-bold uppercase tracking-tighter">Login</span>
+                </a>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Scrollable Icon Reel -->
+        <div class="h-full overflow-x-auto scrollbar-hide snap-x snap-mandatory flex items-center">
+            <?php
+                $reelItems = [
+                    ['route' => 'timeline.index', 'icon' => 'home', 'label' => 'Home'],
+                    ['route' => 'discover.index', 'icon' => 'compass', 'label' => 'Search'],
+                    ['type' => 'gap'], // Alignment for Slide 1
+                    ['route' => 'cultural-hub.index', 'icon' => 'globe', 'label' => 'Hub'],
+                    ['route' => 'messages.index', 'icon' => 'message-circle', 'label' => 'Chat'],
+                    ['type' => 'gap'], // Alignment for Slide 2
+                    ['route' => 'events.index', 'icon' => 'calendar', 'label' => 'Events'],
+                    ['route' => 'profile.show', 'icon' => 'user', 'label' => 'Profile'],
+                ];
+            ?>
+
+            <?php $__currentLoopData = $reelItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php if(isset($item['type']) && $item['type'] === 'gap'): ?>
+                    <div class="min-w-[20vw] h-full flex items-center justify-center snap-center"></div>
+                <?php else: ?>
+                    <a href="<?php echo e(route($item['route'])); ?>" 
+                       class="min-w-[20vw] h-full flex flex-col items-center justify-center snap-center transition-all <?php echo e(request()->routeIs($item['route']) ? 'text-amber-600' : 'text-stone-500 dark:text-stone-400'); ?>">
+                        <i data-lucide="<?php echo e($item['icon']); ?>" class="w-6 h-6 <?php echo e(request()->routeIs($item['route']) ? 'drop-shadow-[0_0_8px_rgba(217,119,6,0.3)] scale-110' : ''); ?>"></i>
+                        <span class="text-[11px] mt-1 font-bold uppercase tracking-tighter"><?php echo e($item['label']); ?></span>
+                    </a>
+                <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+    </div>
 
     <!-- Create Post Modal -->
     <?php if(auth()->guard()->check()): ?>
