@@ -22,7 +22,6 @@ use Inertia\Inertia;
 //  Public routes
 Route::get('/', [TimelineController::class, 'index'])->name('timeline.index');
 Route::get('/cultural-hub', [CulturalHubController::class, 'index'])->name('cultural-hub.index');
-//Route::get('/cultural-hub/{culture}', [CulturalHubController::class, 'show'])->name('cultural-hub.show');
 Route::get('/discover', [DiscoverController::class, 'index'])->name('discover.index');
 
 
@@ -56,7 +55,6 @@ Route::middleware('auth')->group(function () {
     // Cultural Hub
     Route::get('/cultural-hub/create', [CulturalHubController::class, 'create'])->name('cultural-hub.create');
     Route::post('/cultural-hub/store', [CulturalHubController::class, 'store'])->name('cultural-hub.store');
-    Route::get('/cultural-hub/{culture}', [CulturalHubController::class, 'show'])->name('cultural-hub.show');
     Route::post('/cultures/{culture}/lockin', [CulturalHubController::class, 'lockin'])->name('cultures.lockin');
 
 
@@ -118,3 +116,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/live-stream/{stream}/end', [LiveStreamController::class, 'end'])->name('live-stream.end');
 
 });
+
+Route::get('/cultural-hub/{culture}', [CulturalHubController::class, 'show'])->name('cultural-hub.show');

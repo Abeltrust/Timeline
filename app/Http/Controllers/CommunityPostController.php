@@ -15,36 +15,36 @@ class CommunityPostController extends Controller
      * Store a new post inside a community.
      */
     public function store(Request $request, Community $community)
-{
-    $request->validate([
-        'content' => 'nullable|string|max:2000',
-        'image'   => 'nullable|image|mimes:jpg,jpeg,png,gif',
-        'video'   => 'nullable|mimes:mp4,mov,avi,webm|max:10240',
-        'audio'   => 'nullable|mimes:mp3,wav,ogg|max:5120',
-    ]);
+    {
+        $request->validate([
+            'content' => 'nullable|string|max:2000',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif',
+            'video' => 'nullable|mimes:mp4,mov,avi,webm|max:10240',
+            'audio' => 'nullable|mimes:mp3,wav,ogg|max:5120',
+        ]);
 
-    $post = new CommunityPost();
-    $post->user_id = Auth::id();
-    $post->community_id = $community->id;
-    $post->content = $request->content;
+        $post = new CommunityPost();
+        $post->user_id = Auth::id();
+        $post->community_id = $community->id;
+        $post->content = $request->input('content');
 
-    // Handle media uploads
-    if ($request->hasFile('image')) {
-        $post->image = $request->file('image')->store('posts/images', 'public');
+        // Handle media uploads
+        if ($request->hasFile('image')) {
+            $post->image = $request->file('image')->store('posts/images', 'public');
+        }
+        if ($request->hasFile('video')) {
+            $post->video = $request->file('video')->store('posts/videos', 'public');
+        }
+        if ($request->hasFile('audio')) {
+            $post->audio = $request->file('audio')->store('posts/audio', 'public');
+        }
+
+        $post->save();
+
+        return redirect()
+            ->route('communities.show', $community->id)
+            ->with('success', 'Post created successfully!');
     }
-    if ($request->hasFile('video')) {
-        $post->video = $request->file('video')->store('posts/videos', 'public');
-    }
-    if ($request->hasFile('audio')) {
-        $post->audio = $request->file('audio')->store('posts/audio', 'public');
-    }
-
-    $post->save();
-
-    return redirect()
-        ->route('communities.show', $community->id)
-        ->with('success', 'Post created successfully!');
-}
 
 
     /**

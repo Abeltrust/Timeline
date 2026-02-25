@@ -101,6 +101,25 @@ class User extends Authenticatable
         return $this->hasMany(Message::class);
     }
 
+    public function userRelationships()
+    {
+        return $this->hasMany(UserRelationship::class);
+    }
+
+    public function incrementRelationshipWith(User $user, $points = 1)
+    {
+        $relationship = $this->userRelationships()
+            ->firstOrCreate(['target_user_id' => $user->id]);
+
+        $relationship->increment('points', $points);
+
+        // Level up logic (example: 10 points per level)
+        $newLevel = floor($relationship->points / 10) + 1;
+        if ($newLevel > $relationship->level) {
+            $relationship->update(['level' => $newLevel]);
+        }
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Helper Methods

@@ -169,7 +169,7 @@
                                     <!-- TAP -->
                                     <button onclick="toggleTap({{ $post->id }})" data-tap-post="{{ $post->id }}"
                                         class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition 
-                                                {{ auth()->user()->hasTapped($post) ? 'bg-red-50 text-red-600' : 'text-stone-600 hover:bg-stone-100' }}">
+                                                                        {{ auth()->user()->hasTapped($post) ? 'bg-red-50 text-red-600' : 'text-stone-600 hover:bg-stone-100' }}">
                                         <i data-lucide="heart"
                                             class="w-3 h-3 sm:w-4 sm:h-4 {{ auth()->user()->hasTapped($post) ? 'fill-current' : '' }}"></i>
                                         <span class="font-medium" data-tap-count="{{ $post->id }}">
@@ -328,34 +328,95 @@
 
         // Toggle TAP
         function toggleTap(postId) {
+            let btn = document.querySelector(`[data-tap-post="${postId}"]`);
+            let countSpan = document.querySelector(`[data-tap-count="${postId}"]`);
+            let icon = btn.querySelector('i');
+
+            // Optimistic UI update
+            let isTapped = btn.classList.contains('text-red-600');
+            let currentCount = parseInt(countSpan.textContent) || 0;
+
+            if (isTapped) {
+                btn.classList.remove('bg-red-50', 'text-red-600');
+                btn.classList.add('text-stone-600', 'hover:bg-stone-100');
+                icon.classList.remove('fill-current');
+                countSpan.textContent = Math.max(0, currentCount - 1);
+            } else {
+                btn.classList.add('bg-red-50', 'text-red-600');
+                btn.classList.remove('text-stone-600', 'hover:bg-stone-100');
+                icon.classList.add('fill-current');
+                countSpan.textContent = currentCount + 1;
+            }
+
             fetch(`/timeline/${postId}/tap`, {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
                 .then(res => res.json())
                 .then(data => {
-                    let btn = document.querySelector(`[data-tap-post="${postId}"]`);
-                    let count = document.querySelector(`[data-tap-count="${postId}"]`);
-                    count.textContent = `${data.count} TAPs`;
+                    // Sync with server data
+                    countSpan.textContent = data.count;
                     if (data.tapped) {
                         btn.classList.add('bg-red-50', 'text-red-600');
+                        icon.classList.add('fill-current');
                     } else {
                         btn.classList.remove('bg-red-50', 'text-red-600');
+                        icon.classList.remove('fill-current');
+                    }
+                })
+                .catch(err => {
+                    // Revert on error
+                    console.error('TAP error:', err);
+                    if (isTapped) {
+                        btn.classList.add('bg-red-50', 'text-red-600');
+                        icon.classList.add('fill-current');
+                        countSpan.textContent = currentCount;
+                    } else {
+                        btn.classList.remove('bg-red-50', 'text-red-600');
+                        icon.classList.remove('fill-current');
+                        countSpan.textContent = currentCount;
                     }
                 });
         }
 
         // Toggle Check-In
         function toggleCheckin(postId) {
+            let btn = document.querySelector(`[data-checkin-post="${postId}"]`);
+            let countSpan = document.querySelector(`[data-checkin-count="${postId}"]`);
+            
+            // Optimistic UI update
+            let isCheckedIn = btn.classList.contains('text-green-600');
+            let currentCount = parseInt(countSpan.textContent) || 0;
+            
+            if (isCheckedIn) {
+                btn.classList.remove('text-green-600');
+                countSpan.textContent = Math.max(0, currentCount - 1);
+            } else {
+                btn.classList.add('text-green-600');
+                countSpan.textContent = currentCount + 1;
+            }
+
             fetch(`/timeline/${postId}/checkin`, {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
                 .then(res => res.json())
                 .then(data => {
-                    let count = document.querySelector(`[data-checkin-count="${postId}"]`);
-                    count.textContent = `${data.count} `;
-                    btn.classList.add('text-green-600');
+                    countSpan.textContent = data.count;
+                    if (data.checkedIn) {
+                        btn.classList.add('text-green-600');
+                    } else {
+                        btn.classList.remove('text-green-600');
+                    }
+                })
+                .catch(err => {
+                    console.error('Checkin error:', err);
+                    if (isCheckedIn) {
+                        btn.classList.add('text-green-600');
+                    } else {
+                        btn.classList.remove('text-green-600');
+                    }
+                    countSpan.textContent = currentCount;
                 });
         }
 
@@ -385,12 +446,12 @@
                         const box = document.querySelector(`#resonance-box-${postId} .space-y-2, #resonance-box-${postId} .space-y-3`);
                         if (box) {
                             box.insertAdjacentHTML('beforeend', `
-                            <div class="p-2 sm:p-3 bg-stone-50 rounded-lg">
-                                <span class="font-medium text-stone-800 text-xs sm:text-sm">${data.resonance.user.name}</span>
-                                <p class="text-stone-700 text-xs sm:text-sm leading-snug">${data.resonance.content}</p>
-                                <span class="text-[10px] sm:text-xs text-stone-500">${data.resonance.time}</span>
-                            </div>
-                        `);
+                                    <div class="p-2 sm:p-3 bg-stone-50 rounded-lg">
+                                        <span class="font-medium text-stone-800 text-xs sm:text-sm">${data.resonance.user.name}</span>
+                                        <p class="text-stone-700 text-xs sm:text-sm leading-snug">${data.resonance.content}</p>
+                                        <span class="text-[10px] sm:text-xs text-stone-500">${data.resonance.time}</span>
+                                    </div>
+                                `);
                         }
                         input.value = '';
                         document.querySelector(`[data-resonance-count="${postId}"]`).innerText = `${data.count} Resonance`;
