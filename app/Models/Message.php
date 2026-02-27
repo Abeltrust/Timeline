@@ -15,11 +15,11 @@ class Message extends Model
         'content',
         'type',
         'attachment',
-        'is_read',
+        'status',
     ];
 
     protected $casts = [
-        'is_read' => 'boolean',
+        // 'status' is an enum/string, no special cast needed for basic usage
     ];
 
     // Relationships
@@ -41,6 +41,6 @@ class Message extends Model
 
     public function markAsRead()
     {
-        $this->update(['is_read' => true]);
+        $this->update(['status' => 'read']);
     }
 }

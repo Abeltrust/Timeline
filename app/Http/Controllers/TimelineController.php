@@ -12,19 +12,24 @@ class TimelineController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter', 'all');
-        
+
         $query = Post::with(['user', 'taps', 'resonances', 'lockIns', 'checkIns'])
             ->public()
             ->latest();
 
         if (Auth::check()) {
+            if (!$request->has('filter')) {
+                $filter = 'lockedin';
+            }
+
             switch ($filter) {
                 case 'lockedin':
-                    // Posts from users the current user has locked-in to
+                    // Posts from users the current user has locked-in to + their own posts
                     $lockedInUsers = Auth::user()->interactions()
                         ->where('type', 'lockin')
                         ->where('interactable_type', User::class)
-                        ->pluck('interactable_id');
+                        ->pluck('interactable_id')
+                        ->push(Auth::id());
                     $query->whereIn('user_id', $lockedInUsers);
                     break;
                 case 'cultural':
@@ -35,7 +40,7 @@ class TimelineController extends Controller
         }
 
         $posts = $query->paginate(10);
-        
+
         return view('timeline.index', compact('posts', 'filter'));
     }
 
@@ -70,7 +75,7 @@ class TimelineController extends Controller
     public function tap(Post $post)
     {
         $user = Auth::user();
-        
+
         $interaction = $user->interactions()
             ->where('interactable_type', Post::class)
             ->where('interactable_id', $post->id)
@@ -107,7 +112,7 @@ class TimelineController extends Controller
             'count' => $post->fresh()->taps_count,
         ]);
     }
-   public function resonance(Request $request, Post $post)
+    public function resonance(Request $request, Post $post)
     {
         $request->validate([
             'content' => 'required|string|max:1000',
@@ -115,7 +120,7 @@ class TimelineController extends Controller
 
         $resonance = $post->resonances()->create([
             'user_id' => Auth::id(),
-            'content' => $request->content,
+            'content' => $request->input('content'),
         ]);
 
         $post->increment('resonance_count');
@@ -140,7 +145,7 @@ class TimelineController extends Controller
     public function checkin(Post $post)
     {
         $user = Auth::user();
-        
+
         $interaction = $user->interactions()
             ->where('interactable_type', Post::class)
             ->where('interactable_id', $post->id)
@@ -159,6 +164,11 @@ class TimelineController extends Controller
             ]);
             $post->increment('check_ins_count');
             $checkedIn = true;
+
+            // Increment relationship level with the post creator
+            if ($post->user_id !== $user->id) {
+                $user->incrementRelationshipWith($post->user);
+            }
         }
 
         return response()->json([

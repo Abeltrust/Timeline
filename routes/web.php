@@ -22,12 +22,11 @@ use Inertia\Inertia;
 //  Public routes
 Route::get('/', [TimelineController::class, 'index'])->name('timeline.index');
 Route::get('/cultural-hub', [CulturalHubController::class, 'index'])->name('cultural-hub.index');
-//Route::get('/cultural-hub/{culture}', [CulturalHubController::class, 'show'])->name('cultural-hub.show');
 Route::get('/discover', [DiscoverController::class, 'index'])->name('discover.index');
 
 
 //  Auth routes
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 Route::get('/login', function () {
@@ -55,9 +54,16 @@ Route::middleware('auth')->group(function () {
 
     // Cultural Hub
     Route::get('/cultural-hub/create', [CulturalHubController::class, 'create'])->name('cultural-hub.create');
+    Route::get('/cultural-hub/{culture}/edit', [CulturalHubController::class, 'edit'])->name('cultural-hub.edit');
     Route::post('/cultural-hub/store', [CulturalHubController::class, 'store'])->name('cultural-hub.store');
-    Route::get('/cultural-hub/{culture}', [CulturalHubController::class, 'show'])->name('cultural-hub.show');
-    Route::post('/cultures/{culture}/lockin', [CulturalHubController::class, 'lockin'])->name('cultures.lockin');
+    Route::put('/cultural-hub/{culture}', [CulturalHubController::class, 'update'])->name('cultural-hub.update');
+    Route::delete('/cultural-hub/{culture}', [CulturalHubController::class, 'destroy'])->name('cultural-hub.destroy');
+    Route::post('/cultural-hub/{culture}/lock-in', [CulturalHubController::class, 'lockin'])->name('cultural-hub.lock-in');
+
+
+    // User Interactions
+    Route::post('/users/{user}/lockin', [ProfileController::class, 'lockin'])->name('users.lockin');
+    Route::post('/users/{user}/tap', [ProfileController::class, 'tap'])->name('users.tap');
 
 
     // Profile
@@ -68,10 +74,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/profile/chapters/create', [ProfileController::class, 'createChapter'])->name('profile.chapters.create');
     Route::post('/profile/chapters', [ProfileController::class, 'storeChapter'])->name('profile.chapters.store');
-     Route::post('/profile/photo', [ProfileController::class, 'photo'])->name('profile.photo.upload');
+    Route::post('/profile/photo', [ProfileController::class, 'photo'])->name('profile.photo.upload');
     Route::get('/settings/{id}', [ProfileController::class, 'settings'])->name('settings.index');
     Route::patch('/settings/{id}', [ProfileController::class, 'updateSettings'])->name('settings.update');
-    
+
 
     // Vault
     Route::resource('vault', VaultController::class);
@@ -108,8 +114,10 @@ Route::middleware('auth')->group(function () {
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 
-     Route::get('/live-stream', [LiveStreamController::class, 'index'])->name('live-stream.index');
+    Route::get('/live-stream', [LiveStreamController::class, 'index'])->name('live-stream.index');
     Route::post('/live-stream', [LiveStreamController::class, 'store'])->name('live-stream.store');
     Route::post('/live-stream/{stream}/end', [LiveStreamController::class, 'end'])->name('live-stream.end');
-    
+
 });
+
+Route::get('/cultural-hub/{culture}', [CulturalHubController::class, 'show'])->name('cultural-hub.show');

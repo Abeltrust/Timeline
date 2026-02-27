@@ -23,8 +23,8 @@ class User extends Authenticatable
         'cultural_background',
         'languages',
         'cultural_interests',
-        'is_online',  
-        'last_seen',   
+        'is_online',
+        'last_seen',
     ];
 
     protected $hidden = [
@@ -101,6 +101,25 @@ class User extends Authenticatable
         return $this->hasMany(Message::class);
     }
 
+    public function userRelationships()
+    {
+        return $this->hasMany(UserRelationship::class);
+    }
+
+    public function incrementRelationshipWith(User $user, $points = 1)
+    {
+        $relationship = $this->userRelationships()
+            ->firstOrCreate(['target_user_id' => $user->id]);
+
+        $relationship->increment('points', $points);
+
+        // Level up logic (example: 10 points per level)
+        $newLevel = floor($relationship->points / 10) + 1;
+        if ($newLevel > $relationship->level) {
+            $relationship->update(['level' => $newLevel]);
+        }
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Helper Methods
@@ -139,6 +158,13 @@ class User extends Authenticatable
     | Online/Status Helpers
     |--------------------------------------------------------------------------
     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->avatar
+            ? asset('storage/avatars/' . $this->avatar)
+            : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=F59E0B&background=FEF3C7';
+    }
+
     public function markOnline()
     {
         $this->update([
@@ -161,7 +187,7 @@ class User extends Authenticatable
             return 'online';
         }
 
-        
+
         if ($this->last_seen && $this->last_seen->gt(Carbon::now()->subMinutes(5))) {
             return 'recent';
         }

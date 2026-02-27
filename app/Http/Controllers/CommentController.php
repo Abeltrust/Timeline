@@ -18,7 +18,7 @@ class CommentController extends Controller
         $post = CommunityPost::findOrFail($postId);
 
         $comment = new Comment([
-            'content' => $request->content,
+            'content' => $request->input('content'),
             'user_id' => Auth::id(),
         ]);
 
