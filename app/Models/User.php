@@ -25,6 +25,7 @@ class User extends Authenticatable
         'cultural_interests',
         'is_online',
         'last_seen',
+        'preferences',
     ];
 
     protected $hidden = [
@@ -39,6 +40,7 @@ class User extends Authenticatable
         'cultural_interests' => 'array',
         'is_online' => 'boolean',
         'last_seen' => 'datetime',
+        'preferences' => 'array',
     ];
 
     /*

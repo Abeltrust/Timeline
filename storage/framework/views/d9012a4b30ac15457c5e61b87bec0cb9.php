@@ -13,10 +13,10 @@
         <div
             class="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 text-center sm:text-left">
             <div>
-                <h2 class="text-2xl sm:text-3xl font-bold text-stone-800 mb-2 sm:mb-3">
+                <h2 class="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-white mb-2 sm:mb-3">
                     Cultural Hub
                 </h2>
-                <p class="text-sm sm:text-base text-stone-600 leading-relaxed max-w-2xl">
+                <p class="text-sm sm:text-base text-stone-600 dark:text-stone-400 leading-relaxed max-w-2xl">
                     Discover, preserve, and celebrate the rich tapestry of global cultures.
                     Every tradition has a story, every heritage deserves preservation.
                 </p>
@@ -38,7 +38,7 @@
                 </form>
             </div>
             <?php if(session('success')): ?>
-                <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl flex items-center space-x-3">
+                <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 rounded-xl flex items-center space-x-3">
                     <i data-lucide="check-circle" class="w-5 h-5 transition-colors"></i>
                     <p class="text-sm font-medium"><?php echo e(session('success')); ?></p>
                 </div>
@@ -291,8 +291,8 @@
         <?php if(auth()->guard()->guest()): ?>
             <div class="bg-stone-900 dark:bg-white rounded-[4rem] p-16 mt-24 text-center relative overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.3)] dark:shadow-[0_50px_100px_rgba(0,0,0,0.1)]">
                 <div class="absolute inset-0 opacity-20 pointer-events-none">
-                    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500 rounded-full blur-[150px] translate-x-1/2 -translate-y-1/2"></div>
-                    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600 rounded-full blur-[150px] -translate-x-1/2 translate-y-1/2"></div>
+                    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500 rounded-full blur-[150px] translate-x-1/2 -translate-y-1/2 opacity-30 dark:opacity-20"></div>
+                    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600 rounded-full blur-[150px] -translate-x-1/2 translate-y-1/2 opacity-30 dark:opacity-20"></div>
                 </div>
                 
                 <div class="relative z-10">

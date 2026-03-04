@@ -37,10 +37,21 @@
     
     <script>
         // FOUC Prevention Script
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        const savedTheme = @json(auth()->check() ? (auth()->user()->preferences['theme'] ?? null) : null);
+        const localTheme = localStorage.getItem('theme');
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        
+        const theme = savedTheme || localTheme || systemTheme;
+        
+        if (theme === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
+        }
+        
+        // Sync local storage if it differs from backend
+        if (savedTheme && savedTheme !== localTheme) {
+            localStorage.setItem('theme', savedTheme);
         }
     </script>
     
@@ -284,9 +295,12 @@
                     ['route' => 'cultural-hub.index', 'icon' => 'globe', 'label' => 'Hub'],
                     ['route' => 'messages.index', 'icon' => 'message-circle', 'label' => 'Chat'],
                     ['type' => 'gap'], // Alignment for Slide 2
+                     ['route' => 'communities.index', 'icon' => 'users', 'label' => 'Communities'],
+                    ['route' => 'notifications.index', 'icon' => 'bell', 'label' => 'Alerts'],
+                    ['type' => 'gap'], // Alignment for Slide 3
                     ['route' => 'events.index', 'icon' => 'calendar', 'label' => 'Events'],
                     ['route' => 'profile.show', 'icon' => 'user', 'label' => 'Profile'],
-                ];
+                    ];
             @endphp
 
             @foreach($reelItems as $item)

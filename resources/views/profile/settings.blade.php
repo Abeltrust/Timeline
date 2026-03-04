@@ -7,32 +7,32 @@
             <!-- SIDEBAR -->
             <aside class="bg-white dark:bg-stone-800 border dark:border-stone-700 rounded-xl shadow p-4 space-y-2">
                 <button data-tab="profile"
-                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg bg-amber-50 text-amber-600 font-medium">
+                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-medium">
                     <i data-lucide="user" class="w-5 h-5"></i>
                     Profile
                 </button>
                 <button data-tab="notifications"
-                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50">
+                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-400">
                     <i data-lucide="bell" class="w-5 h-5"></i>
                     Notifications
                 </button>
                 <button data-tab="privacy"
-                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50">
+                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-400">
                     <i data-lucide="lock" class="w-5 h-5"></i>
                     Privacy & Security
                 </button>
                 <button data-tab="cultural"
-                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50">
+                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-400">
                     <i data-lucide="globe" class="w-5 h-5"></i>
                     Cultural Settings
                 </button>
                 <button data-tab="appearance"
-                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50">
+                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-400">
                     <i data-lucide="palette" class="w-5 h-5"></i>
                     Appearance
                 </button>
                 <button data-tab="storage"
-                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50">
+                    class="tab-btn flex items-center gap-2 px-3 py-2 w-full text-left rounded-lg hover:bg-gray-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-400">
                     <i data-lucide="database" class="w-5 h-5"></i>
                     Data & Storage
                 </button>
@@ -145,8 +145,8 @@
 
                 <!-- STORAGE PAGE -->
                 <div id="tab-storage" class="tab-page hidden">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Data & Storage</h2>
-                    <p class="text-gray-600 text-sm">Manage your storage and data usage.</p>
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Data & Storage</h2>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Manage your storage and data usage.</p>
                 </div>
             </main>
         </div>
@@ -162,11 +162,15 @@
                     let target = btn.getAttribute("data-tab");
 
                     // Reset styles
-                    buttons.forEach(b => b.classList.remove("bg-amber-50", "text-amber-600", "font-medium"));
+                    buttons.forEach(b => {
+                        b.classList.remove("bg-amber-50", "dark:bg-amber-900/20", "text-amber-600", "dark:text-amber-400", "font-medium");
+                        b.classList.add("text-stone-600", "dark:text-stone-400");
+                    });
                     pages.forEach(p => p.classList.add("hidden"));
 
                     // Activate selected
-                    btn.classList.add("bg-amber-50", "text-amber-600", "font-medium");
+                    btn.classList.add("bg-amber-50", "dark:bg-amber-900/20", "text-amber-600", "dark:text-amber-400", "font-medium");
+                    btn.classList.remove("text-stone-600", "dark:text-stone-400");
                     document.getElementById("tab-" + target).classList.remove("hidden");
                 });
             });
@@ -175,34 +179,50 @@
             const themeToggleBtn = document.getElementById('theme-toggle');
             const themeToggleSlider = document.getElementById('theme-toggle-slider');
 
-            // Initialize slider position based on current theme
-            if (document.documentElement.classList.contains('dark')) {
-                themeToggleSlider.classList.remove('translate-x-1');
-                themeToggleSlider.classList.add('translate-x-6');
-                themeToggleBtn.classList.remove('bg-gray-200');
-                themeToggleBtn.classList.add('bg-amber-500');
-            }
-
-            themeToggleBtn.addEventListener('click', function () {
-                // Toggle the 'dark' class on HTML element
-                document.documentElement.classList.toggle('dark');
-
-                const isDark = document.documentElement.classList.contains('dark');
-
-                // Update Local Storage
+            function updateThemeUI(isDark) {
                 if (isDark) {
-                    localStorage.setItem('theme', 'dark');
                     themeToggleSlider.classList.remove('translate-x-1');
                     themeToggleSlider.classList.add('translate-x-6');
                     themeToggleBtn.classList.remove('bg-gray-200');
                     themeToggleBtn.classList.add('bg-amber-500');
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
                 } else {
-                    localStorage.setItem('theme', 'light');
                     themeToggleSlider.classList.remove('translate-x-6');
                     themeToggleSlider.classList.add('translate-x-1');
                     themeToggleBtn.classList.remove('bg-amber-500');
                     themeToggleBtn.classList.add('bg-gray-200');
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
                 }
+            }
+
+            // Initialize UI from current state
+            updateThemeUI(document.documentElement.classList.contains('dark'));
+
+            themeToggleBtn.addEventListener('click', function () {
+                const isDark = !document.documentElement.classList.contains('dark');
+                updateThemeUI(isDark);
+
+                // Persist to backend
+                fetch("{{ route('settings.update', Auth::user()->id) }}", {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        preferences: {
+                            theme: isDark ? 'dark' : 'light'
+                        }
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Theme preference saved');
+                    })
+                    .catch(error => console.error('Error saving theme:', error));
             });
         });
     </script>
