@@ -25,6 +25,7 @@ class User extends Authenticatable
         'cultural_interests',
         'is_online',
         'last_seen',
+        'preferences',
     ];
 
     protected $hidden = [
@@ -39,6 +40,7 @@ class User extends Authenticatable
         'cultural_interests' => 'array',
         'is_online' => 'boolean',
         'last_seen' => 'datetime',
+        'preferences' => 'array',
     ];
 
     /*
@@ -140,6 +142,24 @@ class User extends Authenticatable
             ->where('interactable_type', get_class($model))
             ->where('interactable_id', $model->id)
             ->where('type', 'lockin')
+            ->exists();
+    }
+
+    public function hasResonated($model)
+    {
+        return $this->interactions()
+            ->where('interactable_type', get_class($model))
+            ->where('interactable_id', $model->id)
+            ->where('type', 'resonance')
+            ->exists();
+    }
+
+    public function hasCheckedIn($model)
+    {
+        return $this->interactions()
+            ->where('interactable_type', get_class($model))
+            ->where('interactable_id', $model->id)
+            ->where('type', 'checkin')
             ->exists();
     }
 

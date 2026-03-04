@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/cultural-hub/{culture}', [CulturalHubController::class, 'update'])->name('cultural-hub.update');
     Route::delete('/cultural-hub/{culture}', [CulturalHubController::class, 'destroy'])->name('cultural-hub.destroy');
     Route::post('/cultural-hub/{culture}/lock-in', [CulturalHubController::class, 'lockin'])->name('cultural-hub.lock-in');
+    Route::post('/cultural-hub/{culture}/resonance', [CulturalHubController::class, 'resonance'])->name('cultural-hub.resonance');
 
 
     // User Interactions
@@ -116,7 +117,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/live-stream', [LiveStreamController::class, 'index'])->name('live-stream.index');
     Route::post('/live-stream', [LiveStreamController::class, 'store'])->name('live-stream.store');
+    Route::get('/live-stream/{stream}', [LiveStreamController::class, 'show'])->name('live-stream.show');
     Route::post('/live-stream/{stream}/end', [LiveStreamController::class, 'end'])->name('live-stream.end');
+    Route::post('/live-stream/{stream}/ajax-end', [LiveStreamController::class, 'ajaxEnd'])->name('live-stream.ajax-end');
 
 });
 

@@ -21,7 +21,10 @@
             </p>
         </div>
 
+        @include('partials.image-compression')
+
         <form action="{{ route('cultural-hub.update', $culture->id) }}" method="POST" enctype="multipart/form-data"
+            @submit.prevent="if(await handleFormImageCompression($el)) $el.submit()"
             class="bg-white rounded-[2.5rem] p-8 sm:p-12 shadow-2xl border border-stone-100 space-y-10">
             @csrf
             @method('PUT')
@@ -67,18 +70,19 @@
                             class="w-full stnd-input py-3 px-4 appearance-none cursor-pointer">
                             @foreach($categories as $cat)
                                 <option value="{{ $cat }}" {{ (old('category', $culture->category) === $cat) ? 'selected' : '' }}>
-                                    {{ $cat }}</option>
+                                    {{ $cat }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
 
                     <!-- Description -->
                     <div x-data="{ 
-                                            content: @js(old('description', $culture->description)),
-                                            wordCount() {
-                                                return this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
-                                            }
-                                        }">
+                                                content: @js(old('description', $culture->description)),
+                                                wordCount() {
+                                                    return this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
+                                                }
+                                            }">
                         <label for="description"
                             class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2 flex justify-between">
                             <span>Core Story / Description</span>
@@ -119,7 +123,8 @@
                             File</label>
                         @if($culture->video_path)
                             <p class="text-[9px] font-black text-amber-600 mb-2 uppercase tracking-widest">CURRENT:
-                                {{ basename($culture->video_path) }}</p>
+                                {{ basename($culture->video_path) }}
+                            </p>
                         @endif
                         <div
                             class="border-2 border-amber-200 border-dashed rounded-[1.5rem] p-8 text-center hover:border-amber-400 transition-colors bg-amber-50/30">
@@ -172,7 +177,8 @@
                             File</label>
                         @if($culture->audio_path)
                             <p class="text-[9px] font-black text-amber-600 mb-2 uppercase tracking-widest">CURRENT:
-                                {{ basename($culture->audio_path) }}</p>
+                                {{ basename($culture->audio_path) }}
+                            </p>
                         @endif
                         <div
                             class="border-2 border-amber-200 border-dashed rounded-[1.5rem] p-8 text-center hover:border-amber-400 transition-colors bg-amber-50/30">
@@ -211,17 +217,17 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                         <div class="grid grid-cols-1 gap-8 items-start" x-data="{ 
-                                galleryPreviews: [],
-                                handleGallery(e) {
-                                    const files = Array.from(e.target.files).slice(0, 5);
-                                    this.galleryPreviews = [];
-                                    files.forEach(file => {
-                                        const reader = new FileReader();
-                                        reader.onload = (e) => this.galleryPreviews.push(e.target.result);
-                                        reader.readAsDataURL(file);
-                                    });
-                                }
-                            }">
+                                    galleryPreviews: [],
+                                    handleGallery(e) {
+                                        const files = Array.from(e.target.files).slice(0, 5);
+                                        this.galleryPreviews = [];
+                                        files.forEach(file => {
+                                            const reader = new FileReader();
+                                            reader.onload = (e) => this.galleryPreviews.push(e.target.result);
+                                            reader.readAsDataURL(file);
+                                        });
+                                    }
+                                }">
                             <!-- Cover Image -->
                             <div>
                                 <label

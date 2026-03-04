@@ -9,22 +9,25 @@
         <div class="mb-8 text-center sm:text-left">
             <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-4">
                 <a href="{{ route('cultural-hub.index') }}"
-                    class="p-2 text-stone-600 hover:text-stone-800 hover:bg-stone-100 rounded-lg transition-colors mb-2 sm:mb-0 w-fit">
+                    class="p-2 text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors mb-2 sm:mb-0 w-fit">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 </a>
                 <div class="flex items-center space-x-3">
                     <i data-lucide="globe" class="w-8 h-8 text-amber-600"></i>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-stone-800">Share Your Culture</h1>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-stone-100">Share Your Culture</h1>
                 </div>
             </div>
-            <p class="text-stone-600 text-sm sm:text-base">Contribute to global heritage by sharing your traditions and
+            <p class="text-stone-600 dark:text-stone-400 text-sm sm:text-base">Contribute to global heritage by sharing your
+                traditions and
                 stories.</p>
         </div>
 
-        <form action="{{ route('cultural-hub.store') }}" method="POST" enctype="multipart/form-data"
-            class="bg-white rounded-[2.5rem] p-8 sm:p-12 shadow-2xl border border-stone-100 space-y-10">
-            @csrf
+        @include('partials.image-compression')
 
+        <form action="{{ route('cultural-hub.store') }}" method="POST" enctype="multipart/form-data"
+            @submit.prevent="if(await handleFormImageCompression($el)) $el.submit()"
+            class="bg-white dark:bg-stone-900 rounded-[2.5rem] p-8 sm:p-12 shadow-2xl border border-stone-100 dark:border-stone-800 space-y-10">
+            @csrf
             <div class="space-y-8">
                 <!-- Basic Info Section -->
                 <div class="space-y-6">
@@ -71,11 +74,11 @@
 
                     <!-- Description -->
                     <div x-data="{ 
-                                        content: '{{ old('description') }}',
-                                        wordCount() {
-                                            return this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
-                                        }
-                                    }">
+                                                    content: '{{ old('description') }}',
+                                                    wordCount() {
+                                                        return this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
+                                                    }
+                                                }">
                         <label for="description"
                             class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2 flex justify-between">
                             <span>Core Story / Description</span>
@@ -93,19 +96,19 @@
                 </div>
 
                 <!-- Video Section -->
-                <div class="pt-10 border-t border-stone-100 space-y-6" x-data="{ mode: 'file' }">
+                <div class="pt-10 border-t border-stone-100 dark:border-stone-800 space-y-6" x-data="{ mode: 'file' }">
                     <div class="flex items-center justify-between mb-4">
                         <div
                             class="flex items-center space-x-2 text-amber-600 uppercase tracking-tighter text-xs font-black">
                             <i data-lucide="video" class="w-4 h-4"></i>
                             <span>Video Highlight</span>
                         </div>
-                        <div class="flex bg-stone-100 p-1 rounded-xl">
+                        <div class="flex bg-stone-100 dark:bg-stone-800 p-1 rounded-xl">
                             <button type="button" @click="mode = 'file'"
-                                :class="mode === 'file' ? 'bg-white shadow-sm text-amber-600' : 'text-stone-500'"
+                                :class="mode === 'file' ? 'bg-white dark:bg-stone-700 shadow-sm text-amber-600' : 'text-stone-500 dark:text-stone-400'"
                                 class="px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all">UPLOAD</button>
                             <button type="button" @click="mode = 'link'"
-                                :class="mode === 'link' ? 'bg-white shadow-sm text-amber-600' : 'text-stone-500'"
+                                :class="mode === 'link' ? 'bg-white dark:bg-stone-700 shadow-sm text-amber-600' : 'text-stone-500 dark:text-stone-400'"
                                 class="px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ml-1">LINK</button>
                         </div>
                     </div>
@@ -114,14 +117,17 @@
                         <label class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">Video
                             File</label>
                         <div
-                            class="border-2 border-amber-200 border-dashed rounded-[1.5rem] p-8 text-center hover:border-amber-400 transition-colors bg-amber-50/30">
+                            class="border-2 border-amber-200 dark:border-amber-900/50 border-dashed rounded-[1.5rem] p-8 text-center hover:border-amber-400 transition-colors bg-amber-50/30 dark:bg-amber-900/5">
                             <input type="file" name="video_file" id="video_file" class="hidden" accept="video/*"
                                 x-on:change="$refs.vLabel.innerText = $el.files[0].name">
                             <label for="video_file" class="cursor-pointer group">
                                 <i data-lucide="upload-cloud"
                                     class="w-10 h-10 text-amber-400 mx-auto mb-3 group-hover:scale-110 transition-transform"></i>
-                                <p class="text-xs font-bold text-stone-600" x-ref="vLabel">DROP VIDEO OR CLICK TO BROWSE</p>
-                                <p class="text-[9px] text-stone-400 mt-1 uppercase tracking-widest font-black">MP4, MOV up
+                                <p class="text-xs font-bold text-stone-600 dark:text-stone-400" x-ref="vLabel">DROP VIDEO OR
+                                    CLICK TO BROWSE</p>
+                                <p
+                                    class="text-[9px] text-stone-400 dark:text-stone-500 mt-1 uppercase tracking-widest font-black">
+                                    MP4, MOV up
                                     to 50MB</p>
                             </label>
                         </div>
@@ -140,19 +146,19 @@
                 </div>
 
                 <!-- Audio Section -->
-                <div class="pt-10 border-t border-stone-100 space-y-6" x-data="{ mode: 'file' }">
+                <div class="pt-10 border-t border-stone-100 dark:border-stone-800 space-y-6" x-data="{ mode: 'file' }">
                     <div class="flex items-center justify-between mb-4">
                         <div
                             class="flex items-center space-x-2 text-amber-600 uppercase tracking-tighter text-xs font-black">
                             <i data-lucide="music" class="w-4 h-4"></i>
                             <span>Audio Archive</span>
                         </div>
-                        <div class="flex bg-stone-100 p-1 rounded-xl">
+                        <div class="flex bg-stone-100 dark:bg-stone-800 p-1 rounded-xl">
                             <button type="button" @click="mode = 'file'"
-                                :class="mode === 'file' ? 'bg-white shadow-sm text-amber-600' : 'text-stone-500'"
+                                :class="mode === 'file' ? 'bg-white dark:bg-stone-700 shadow-sm text-amber-600' : 'text-stone-500 dark:text-stone-400'"
                                 class="px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all">UPLOAD</button>
                             <button type="button" @click="mode = 'link'"
-                                :class="mode === 'link' ? 'bg-white shadow-sm text-amber-600' : 'text-stone-500'"
+                                :class="mode === 'link' ? 'bg-white dark:bg-stone-700 shadow-sm text-amber-600' : 'text-stone-500 dark:text-stone-400'"
                                 class="px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ml-1">LINK</button>
                         </div>
                     </div>
@@ -161,14 +167,17 @@
                         <label class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">Audio
                             File</label>
                         <div
-                            class="border-2 border-amber-200 border-dashed rounded-[1.5rem] p-8 text-center hover:border-amber-400 transition-colors bg-amber-50/30">
+                            class="border-2 border-amber-200 dark:border-amber-900/50 border-dashed rounded-[1.5rem] p-8 text-center hover:border-amber-400 transition-colors bg-amber-50/30 dark:bg-amber-900/5">
                             <input type="file" name="audio_file" id="audio_file" class="hidden" accept="audio/*"
                                 x-on:change="$refs.aLabel.innerText = $el.files[0].name">
                             <label for="audio_file" class="cursor-pointer group">
                                 <i data-lucide="mic-2"
                                     class="w-10 h-10 text-amber-400 mx-auto mb-3 group-hover:scale-110 transition-transform"></i>
-                                <p class="text-xs font-bold text-stone-600" x-ref="aLabel">DROP AUDIO OR CLICK TO BROWSE</p>
-                                <p class="text-[9px] text-stone-400 mt-1 uppercase tracking-widest font-black">MP3, WAV up
+                                <p class="text-xs font-bold text-stone-600 dark:text-stone-400" x-ref="aLabel">DROP AUDIO OR
+                                    CLICK TO BROWSE</p>
+                                <p
+                                    class="text-[9px] text-stone-400 dark:text-stone-500 mt-1 uppercase tracking-widest font-black">
+                                    MP3, WAV up
                                     to 20MB</p>
                             </label>
                         </div>
@@ -187,7 +196,7 @@
                 </div>
 
                 <!-- Media & Licensing Section -->
-                <div class="pt-10 border-t border-stone-100 space-y-6">
+                <div class="pt-10 border-t border-stone-100 dark:border-stone-800 space-y-6">
                     <div
                         class="flex items-center space-x-2 text-amber-600 uppercase tracking-tighter text-xs font-black mb-4">
                         <i data-lucide="copyright" class="w-4 h-4"></i>
@@ -196,44 +205,45 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                         <div class="grid grid-cols-1 gap-8 items-start" x-data="{ 
-                            galleryPreviews: [],
-                            handleGallery(e) {
-                                const files = Array.from(e.target.files).slice(0, 5);
-                                this.galleryPreviews = [];
-                                files.forEach(file => {
-                                    const reader = new FileReader();
-                                    reader.onload = (e) => this.galleryPreviews.push(e.target.result);
-                                    reader.readAsDataURL(file);
-                                });
-                            }
-                        }">
+                                        galleryPreviews: [],
+                                        handleGallery(e) {
+                                            const files = Array.from(e.target.files).slice(0, 5);
+                                            this.galleryPreviews = [];
+                                            files.forEach(file => {
+                                                const reader = new FileReader();
+                                                reader.onload = (e) => this.galleryPreviews.push(e.target.result);
+                                                reader.readAsDataURL(file);
+                                            });
+                                        }
+                                    }">
                             <!-- Cover Image -->
                             <div>
                                 <label
                                     class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2">Primary
                                     Cover Image</label>
                                 <div
-                                    class="border-2 border-amber-200 border-dashed rounded-2xl p-6 text-center hover:border-amber-400 transition-colors bg-amber-50/10">
+                                    class="border-2 border-amber-200 dark:border-amber-900/50 border-dashed rounded-2xl p-6 text-center hover:border-amber-400 transition-colors bg-amber-50/10">
                                     <input id="image" name="image" type="file" class="hidden" accept="image/*"
                                         x-on:change="$refs.iLabel.innerText = $el.files[0].name">
                                     <label for="image" class="cursor-pointer group">
                                         <i data-lucide="image"
                                             class="w-8 h-8 text-amber-400 mx-auto mb-2 group-hover:scale-110 transition-transform"></i>
-                                        <p class="text-[10px] font-black text-stone-600 uppercase" x-ref="iLabel">Select
+                                        <p class="text-[10px] font-black text-stone-600 dark:text-stone-400 uppercase"
+                                            x-ref="iLabel">Select
                                             Story Cover</p>
                                     </label>
                                 </div>
                             </div>
 
                             <!-- Gallery Images -->
-                            <div class="pt-6 border-t border-stone-100">
+                            <div class="pt-6 border-t border-stone-100 dark:border-stone-800">
                                 <label
                                     class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2 flex justify-between">
                                     <span>Visual Gallery (Up to 5 Images)</span>
                                     <span class="text-amber-600" x-text="galleryPreviews.length + '/5'"></span>
                                 </label>
                                 <div
-                                    class="border-2 border-stone-200 border-dashed rounded-2xl p-6 text-center hover:border-amber-400 transition-colors">
+                                    class="border-2 border-stone-200 dark:border-stone-700 border-dashed rounded-2xl p-6 text-center hover:border-amber-400 transition-colors">
                                     <input id="images" name="images[]" type="file" class="hidden" accept="image/*" multiple
                                         @change="handleGallery">
                                     <label for="images" class="cursor-pointer group">
@@ -247,7 +257,7 @@
                                 <div class="grid grid-cols-5 gap-2 mt-4" x-show="galleryPreviews.length > 0">
                                     <template x-for="(src, index) in galleryPreviews" :key="index">
                                         <div
-                                            class="aspect-square rounded-lg overflow-hidden border border-stone-200 bg-stone-50 relative group">
+                                            class="aspect-square rounded-lg overflow-hidden border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 relative group">
                                             <img :src="src" class="w-full h-full object-cover">
                                             <div
                                                 class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">

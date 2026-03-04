@@ -3,7 +3,7 @@
 @section('title', 'Cultural Hub - Explore Global Heritage')
 
 @section('content')
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 relative">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-10 relative">
         <!-- Background Decorative Elements -->
         <div class="fixed inset-0 pointer-events-none z-0 opacity-30 dark:opacity-20">
             <div class="absolute top-[10%] left-[5%] w-96 h-96 bg-amber-500/10 rounded-full blur-[120px]"></div>
@@ -13,25 +13,32 @@
         <div
             class="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 text-center sm:text-left">
             <div>
-                <h2 class="text-2xl sm:text-3xl font-bold text-stone-800 mb-2 sm:mb-3">
+                <h2 class="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-white mb-2 sm:mb-3">
                     Cultural Hub
                 </h2>
-                <p class="text-sm sm:text-base text-stone-600 leading-relaxed max-w-2xl">
+                <p class="text-sm sm:text-base text-stone-600 dark:text-stone-400 leading-relaxed max-w-2xl">
                     Discover, preserve, and celebrate the rich tapestry of global cultures.
                     Every tradition has a story, every heritage deserves preservation.
                 </p>
             </div>
-            @auth
-                <div class="flex-shrink-0">
-                    <a href="{{ route('cultural-hub.create') }}"
-                        class="inline-flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold hover:from-amber-600 hover:to-orange-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                        <span>Share Your Culture</span>
-                    </a>
-                </div>
-            @endauth
+            <div class="flex-shrink-0 w-full sm:w-80">
+                <form action="{{ route('cultural-hub.index') }}" method="GET" class="relative group">
+                    @if($category !== 'all')
+                        <input type="hidden" name="category" value="{{ $category }}">
+                    @endif
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="w-4 h-4 text-stone-400 group-focus-within:text-amber-500 transition-colors"></i>
+                    </div>
+                    <input type="text" 
+                           name="search" 
+                           value="{{ request('search') }}" 
+                           placeholder="Search stories..." 
+                           class="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-stone-900/50 backdrop-blur-md border border-stone-200 dark:border-stone-800 rounded-2xl text-sm font-bold placeholder:text-stone-400 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all">
+                    <button type="submit" class="hidden"></button>
+                </form>
+            </div>
             @if(session('success'))
-                <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl flex items-center space-x-3">
+                <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 rounded-xl flex items-center space-x-3">
                     <i data-lucide="check-circle" class="w-5 h-5 transition-colors"></i>
                     <p class="text-sm font-medium">{{ session('success') }}</p>
                 </div>
@@ -41,8 +48,8 @@
         <!-- Main Discovery Container -->
         <div class="lg:grid lg:grid-cols-12 lg:gap-12 items-start" x-data="{ mobileFiltersOpen: false }">
             
-            <!-- Main Content Area (Column 1-9 on LG) -->
-            <div class="lg:col-span-9 space-y-10 order-last lg:order-first">
+            <!-- Main Content Area (Column 1-9 on LARGE) -->
+            <div class="lg:col-span-9 space-y-12 order-last lg:order-first">
                 
                 <!-- Mobile Dropdown Toolbar (Premium Glassmorphism) -->
                 <div class="lg:hidden flex items-center justify-between backdrop-blur-xl bg-white/80 dark:bg-stone-900/80 p-5 rounded-[2rem] border border-white/20 dark:border-stone-800/50 shadow-2xl relative z-40 mb-8">
@@ -89,116 +96,81 @@
                     </div>
                 </div>
 
-                <!-- Cultures Grid (Cinematic Cards) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                <!-- Cultures Grid (Refined Tile Style) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
                     @forelse($cultures as $culture)
-                        <div class="bg-white dark:bg-stone-900 rounded-[3rem] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_30px_70px_rgba(0,0,0,0.12)] transition-all duration-700 group border border-stone-100 dark:border-stone-800/50 flex flex-col h-full transform hover:-translate-y-4">
+                        <div class="border border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col h-full group">
+                            
                             <!-- Image Section -->
-                            <div class="aspect-[4/5] overflow-hidden relative">
-                                <div class="absolute top-6 left-6 z-20 flex flex-col gap-2">
-                                    <span class="backdrop-blur-md bg-black/30 text-white px-4 py-1.5 rounded-full text-[9px] uppercase tracking-[0.2em] font-black border border-white/20 shadow-lg">
-                                        {{ $culture->category }}
-                                    </span>
-                                    @if($culture->status === 'featured')
-                                        <span class="backdrop-blur-md bg-amber-500/80 text-white px-4 py-1.5 rounded-full text-[9px] uppercase tracking-[0.2em] font-black border border-amber-400/50 shadow-lg flex items-center">
-                                            <i data-lucide="crown" class="w-3 h-3 mr-1.5"></i>
-                                            Featured
-                                        </span>
-                                    @endif
-                                </div>
-
+                            <div class="h-40 relative overflow-hidden bg-stone-100 dark:bg-stone-800/50">
                                 @if($culture->image)
-                                    <img src="{{ Storage::url($culture->image) }}" alt="{{ $culture->name }}"
-                                         class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110">
+                                    <img src="{{ Storage::url($culture->image) }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                                 @else
-                                    <div class="w-full h-full bg-gradient-to-br from-amber-500/10 to-orange-600/10 flex items-center justify-center">
-                                        <i data-lucide="globe" class="w-16 h-16 text-amber-600/20"></i>
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <i data-lucide="globe" class="w-10 h-10 text-stone-300 dark:text-stone-700"></i>
                                     </div>
                                 @endif
                                 
-                                <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                                
-                                @auth
-                                    @if(auth()->id() === $culture->submitted_by)
-                                        <!-- Owner Actions Dropdown -->
-                                        <div class="absolute top-6 right-6 z-30" x-data="{ open: false }">
-                                            <button @click="open = !open" class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center hover:bg-white/40 transition-all">
-                                                <i data-lucide="more-horizontal" class="w-5 h-5"></i>
-                                            </button>
-                                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-100 dark:border-stone-800 overflow-hidden py-2" x-cloak>
-                                                <a href="{{ route('cultural-hub.edit', $culture->id) }}" class="flex items-center px-6 py-3 text-xs font-black uppercase text-stone-600 hover:bg-stone-50"><i data-lucide="edit-3" class="w-3.5 h-3.5 mr-3 text-amber-500"></i> Edit Legend</a>
-                                                <form action="{{ route('cultural-hub.destroy', $culture->id) }}" method="POST" onsubmit="return confirm('Enshrine this deletion?')">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="w-full flex items-center px-6 py-3 text-xs font-black uppercase text-red-600 hover:bg-red-50"><i data-lucide="trash-2" class="w-3.5 h-3.5 mr-3"></i> Dissolve</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endauth
-
-                                <!-- Floating Lock-In Badge -->
-                                <div class="absolute bottom-6 right-6 z-20">
-                                    <button onclick="toggleCultureLockin({{ $culture->id }})" 
-                                            class="w-12 h-12 rounded-2xl {{ auth()->check() && auth()->user()->hasLockedIn($culture) ? 'bg-amber-500 text-white' : 'bg-white/90 text-stone-900' }} backdrop-blur-md flex items-center justify-center shadow-2xl hover:scale-110 transition-transform group/lock">
-                                        <i data-lucide="{{ auth()->check() && auth()->user()->hasLockedIn($culture) ? 'check' : 'lock' }}" class="w-5 h-5 group-hover/lock:scale-110 transition-transform"></i>
-                                    </button>
+                                <!-- Category Badge -->
+                                <div class="absolute top-3 right-3 px-2 py-1 bg-black/50 backdrop-blur-md rounded-lg border border-white/10">
+                                    <span class="text-[9px] font-black text-white uppercase tracking-widest">{{ $culture->category }}</span>
                                 </div>
                             </div>
 
-                            <!-- Content Section -->
-                            <div class="p-8 flex-1 flex flex-col relative">
-                                <!-- Guardian Badge -->
-                                <div class="absolute -top-6 left-8 bg-white dark:bg-stone-900 px-4 py-2 rounded-xl border border-stone-100 dark:border-stone-800 shadow-lg flex items-center space-x-2">
-                                     <div class="w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center">
-                                         <i data-lucide="user" class="w-2.5 h-2.5 text-white"></i>
-                                     </div>
-                                     <span class="text-[9px] font-black text-stone-500 dark:text-stone-400 uppercase tracking-widest">{{ $culture->submitter->name ?? 'Timeline Guardian' }}</span>
-                                </div>
-
-                                <div class="mb-6 mt-4">
-                                    <div class="flex items-center space-x-2 text-amber-500 mb-2 uppercase tracking-[0.2em] text-[9px] font-black">
-                                        <i data-lucide="sparkles" class="w-3 h-3"></i>
-                                        <span>Heritage Enshrined</span>
-                                    </div>
-                                    
-                                    <h3 class="font-black text-stone-900 dark:text-white text-2xl mb-2 tracking-tighter leading-tight group-hover:text-amber-600 transition-colors">
+                            <!-- Content Info Body -->
+                            <div class="p-5 flex-1 flex flex-col justify-between">
+                                <div class="space-y-1">
+                                    <h3 class="font-bold text-stone-900 dark:text-stone-100 text-lg leading-tight truncate">
                                         {{ $culture->name }}
                                     </h3>
-                                    
-                                    <div class="flex items-center text-stone-400 text-xs font-bold uppercase tracking-widest">
-                                        <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-2 text-amber-500 opacity-60"></i>
+                                    <p class="text-stone-600 dark:text-stone-400 text-sm truncate uppercase tracking-wider font-medium">
                                         {{ $culture->region }}
-                                    </div>
+                                    </p>
                                 </div>
 
-                                <p class="text-stone-500 dark:text-stone-400 text-sm leading-relaxed mb-8 line-clamp-2 italic font-medium flex-1">
-                                    "{{ $culture->description }}"
-                                </p>
+                                <!-- Stats -->
+                                <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-stone-500 dark:text-stone-500 uppercase tracking-tight">
+                                    <span class="flex items-center gap-1.5" title="Resonance">
+                                        <i data-lucide="zap" 
+                                           id="culture-vibe-icon-{{ $culture->id }}"
+                                           class="w-3.5 h-3.5 {{ auth()->check() && auth()->user()->hasResonated($culture) ? 'text-orange-500 fill-orange-500' : '' }}"></i>
+                                        <span id="culture-vibe-count-{{ $culture->id }}">{{ $culture->resonance_count }}</span>
+                                    </span>
+                                    <span class="flex items-center gap-1.5" title="Lock-ins">
+                                        <i data-lucide="lock" 
+                                           id="culture-lock-icon-{{ $culture->id }}"
+                                           class="w-3.5 h-3.5 {{ auth()->check() && auth()->user()->hasLockedIn($culture) ? 'text-amber-500' : '' }}"></i>
+                                        <span id="culture-lock-count-{{ $culture->id }}">{{ $culture->locked_in_count }}</span>
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        {{ $culture->created_at->diffForHumans(null, true) }}
+                                    </span>
+                                </div>
 
-                                <!-- Card Footer -->
-                                <div class="pt-6 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
-                                    <div class="flex items-center space-x-6">
-                                        <div class="flex flex-col">
-                                            <span class="text-xl font-black text-stone-900 dark:text-white leading-none tracking-tighter">{{ $culture->locked_in_count }}</span>
-                                            <span class="text-[8px] font-black text-stone-400 uppercase tracking-widest mt-1">Locked-In</span>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <span class="text-xl font-black text-stone-900 dark:text-white leading-none tracking-tighter">{{ $culture->resonance_count }}</span>
-                                            <span class="text-[8px] font-black text-stone-400 uppercase tracking-widest mt-1">Pulses</span>
-                                        </div>
-                                    </div>
+                                <!-- Action Buttons -->
+                                <div class="mt-4 flex gap-2">
+                                    @auth
+                                        <button onclick="toggleCultureLockin({{ $culture->id }})" 
+                                                id="culture-lock-btn-{{ $culture->id }}"
+                                                class="flex-1 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 transition shadow-sm active:scale-95">
+                                            {{ auth()->user()->hasLockedIn($culture) ? 'Locked-in' : 'Lock-in' }}
+                                        </button>
+                                    @else
+                                        <a href="{{ route('login') }}" class="flex-1 px-4 py-2.5 text-center rounded-xl text-xs font-black uppercase tracking-widest bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 transition shadow-sm">
+                                            Lock-in
+                                        </a>
+                                    @endauth
 
                                     <a href="{{ route('cultural-hub.show', $culture->id) }}" 
-                                       class="group/btn relative overflow-hidden px-6 py-3 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95">
-                                        <span class="relative z-10 flex items-center space-x-2">
-                                            <span>Explore</span>
-                                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform"></i>
-                                        </span>
+                                       class="flex-1 px-4 py-2.5 text-center rounded-xl text-xs font-black uppercase tracking-widest border border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition active:scale-95">
+                                        Explore
                                     </a>
                                 </div>
                             </div>
                         </div>
                     @empty
+                        <!-- Empty state remains same -->
                         <div class="col-span-full text-center py-24 backdrop-blur-md bg-stone-50/50 dark:bg-stone-900/10 rounded-[4rem] border-4 border-dashed border-stone-200 dark:border-stone-800">
                             <i data-lucide="globe" class="w-24 h-24 text-amber-500/10 mx-auto mb-8"></i>
                             <h3 class="text-2xl font-black text-stone-800 dark:text-white uppercase tracking-tighter mb-4">The Archive lies Silent</h3>
@@ -214,13 +186,31 @@
                 <!-- Pagination (Premium Aesthetic) -->
                 @if($cultures->hasPages())
                     <div class="pt-12 border-t border-stone-100 dark:border-stone-800">
-                        {{ $cultures->links() }}
+                        <!-- Desktop Pagination -->
+                        <div class="hidden sm:block">
+                            {{ $cultures->links() }}
+                        </div>
+                        
+                        <!-- Mobile Explore More Button -->
+                        <div class="sm:hidden flex justify-center">
+                            @if($cultures->hasMorePages())
+                                <a href="{{ $cultures->nextPageUrl() }}" 
+                                   class="inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full font-black uppercase tracking-widest text-[10px] shadow-xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all animate-pulse-subtle">
+                                    <span>Explore More Traditions</span>
+                                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                                </a>
+                            @else
+                                <div class="px-8 py-4 bg-stone-100 dark:bg-stone-800 rounded-full text-stone-400 text-[10px] font-black uppercase tracking-widest">
+                                    End of the Archive
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @endif
             </div>
 
-            <!-- Desktop Sidebar (Relocated to Right + Floating Glass) -->
-            <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-8 lg:order-last">
+            <!-- Desktop Sidebar (Column 10-12) -->
+            <aside class="hidden lg:block lg:col-span-3 sticky top-28 space-y-10 lg:order-last">
                 <div class="backdrop-blur-2xl bg-white/70 dark:bg-stone-900/70 rounded-[3rem] border border-white/40 dark:border-stone-800/50 p-10 shadow-2xl shadow-amber-500/5">
                     <!-- Premium Search Filter -->
                     <form action="{{ route('cultural-hub.index') }}" method="GET" class="mb-10 p-1.5 bg-stone-100/50 dark:bg-stone-800/50 rounded-2xl flex items-center border border-stone-200 dark:border-stone-700 focus-within:border-amber-400 focus-within:ring-8 focus-within:ring-amber-400/5 transition-all group">
@@ -283,8 +273,8 @@
         @guest
             <div class="bg-stone-900 dark:bg-white rounded-[4rem] p-16 mt-24 text-center relative overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.3)] dark:shadow-[0_50px_100px_rgba(0,0,0,0.1)]">
                 <div class="absolute inset-0 opacity-20 pointer-events-none">
-                    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500 rounded-full blur-[150px] translate-x-1/2 -translate-y-1/2"></div>
-                    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600 rounded-full blur-[150px] -translate-x-1/2 translate-y-1/2"></div>
+                    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500 rounded-full blur-[150px] translate-x-1/2 -translate-y-1/2 opacity-30 dark:opacity-20"></div>
+                    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600 rounded-full blur-[150px] -translate-x-1/2 translate-y-1/2 opacity-30 dark:opacity-20"></div>
                 </div>
                 
                 <div class="relative z-10">
@@ -326,7 +316,60 @@
             .then(response => response.json())
             .then(data => {
                 if (data.lockedIn !== undefined) {
-                    location.reload(); // Simple reload for state consistency, or update DOM
+                    const icon = document.getElementById(`culture-lock-icon-${id}`);
+                    const count = document.getElementById(`culture-lock-count-${id}`);
+                    
+                    if (data.lockedIn) {
+                        icon.classList.add('text-amber-500');
+                        icon.classList.remove('text-stone-400');
+                        icon.setAttribute('data-lucide', 'check-circle');
+                        count.classList.add('text-amber-600');
+                        count.classList.remove('text-stone-400');
+                    } else {
+                        icon.classList.remove('text-amber-500');
+                        icon.classList.add('text-stone-400');
+                        icon.setAttribute('data-lucide', 'lock');
+                        count.classList.remove('text-amber-600');
+                        count.classList.add('text-stone-400');
+                    }
+                    count.textContent = data.count;
+                    lucide.createIcons();
+                }
+            });
+        }
+
+        function toggleCultureResonance(id) {
+            @guest
+                window.location.href = "{{ route('login') }}";
+                return;
+            @endguest
+
+            fetch(`/cultural-hub/${id}/resonance`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.resonated !== undefined) {
+                    const icon = document.getElementById(`culture-vibe-icon-${id}`);
+                    const count = document.getElementById(`culture-vibe-count-${id}`);
+                    
+                    if (data.resonated) {
+                        icon.classList.add('text-orange-500', 'fill-orange-500');
+                        icon.classList.remove('text-stone-400');
+                        count.classList.add('text-orange-600');
+                        count.classList.remove('text-stone-400');
+                    } else {
+                        icon.classList.remove('text-orange-500', 'fill-orange-500');
+                        icon.classList.add('text-stone-400');
+                        count.classList.remove('text-orange-600');
+                        count.classList.add('text-stone-400');
+                    }
+                    count.textContent = data.count;
                 }
             });
         }

@@ -9,27 +9,30 @@
 
             
             <?php if(auth()->guard()->check()): ?>
-                <div class="bg-white rounded-2xl shadow-md p-6 border border-stone-100">
+                <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-md p-6 border border-stone-100 dark:border-stone-800">
                     <form id="community-post-form" action="<?php echo e(route('communities.posts.store', $community->id)); ?>" method="POST"
                         enctype="multipart/form-data" class="space-y-4">
                         <?php echo csrf_field(); ?>
                         <input type="hidden" name="community_id" value="<?php echo e($community->id); ?>">
                         <textarea name="content" rows="5"
-                            class="w-full p-4 border border-stone-300 rounded-2xl resize-none focus:ring-2 focus:ring-amber-300 text-sm sm:text-base placeholder-stone-400"
+                            class="w-full p-4 border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-2xl resize-none focus:ring-2 focus:ring-amber-300 text-sm sm:text-base placeholder-stone-400 dark:placeholder-stone-500"
                             placeholder="Share something with <?php echo e($community->name); ?>..."></textarea>
 
                         <div class="flex items-center justify-between gap-3 flex-wrap">
-                            <div class="flex items-center gap-3 text-stone-600">
-                                <label title="Add image" class="cursor-pointer p-2 rounded-md hover:bg-stone-50 transition">
+                            <div class="flex items-center gap-3 text-stone-600 dark:text-stone-400">
+                                <label title="Add image"
+                                    class="cursor-pointer p-2 rounded-md hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                                     <i data-lucide="image" class="w-6 h-6"></i>
                                     <input id="community-image-input" type="file" name="image" accept="image/*" class="hidden"
                                         onchange="previewImage(event,'image-preview')">
                                 </label>
-                                <label title="Add video" class="cursor-pointer p-2 rounded-md hover:bg-stone-50 transition">
+                                <label title="Add video"
+                                    class="cursor-pointer p-2 rounded-md hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                                     <i data-lucide="video" class="w-6 h-6"></i>
                                     <input type="file" name="video" accept="video/*" class="hidden">
                                 </label>
-                                <label title="Add audio" class="cursor-pointer p-2 rounded-md hover:bg-stone-50 transition">
+                                <label title="Add audio"
+                                    class="cursor-pointer p-2 rounded-md hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                                     <i data-lucide="mic" class="w-6 h-6"></i>
                                     <input type="file" name="audio" accept="audio/*" class="hidden">
                                 </label>
@@ -53,21 +56,27 @@
             
             <div class="space-y-6" id="posts-feed">
                 <?php $__empty_1 = true; $__currentLoopData = $posts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $post): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <div class="bg-white rounded-2xl shadow-md border border-stone-100 p-5 post-card" id="post-<?php echo e($post->id); ?>">
+                    <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-md border border-stone-100 dark:border-stone-800 p-5 post-card"
+                        id="post-<?php echo e($post->id); ?>">
 
                         
                         <div class="flex items-center gap-3 mb-3">
                             <img src="<?php echo e($post->user->profile_photo_url); ?>" alt="<?php echo e($post->user->name); ?>"
                                 class="w-12 h-12 rounded-full object-cover">
                             <div>
-                                <p class="font-semibold text-sm sm:text-base text-stone-800"><?php echo e($post->user->name); ?></p>
-                                <p class="text-xs sm:text-sm text-stone-500"><?php echo e($post->created_at->diffForHumans()); ?></p>
+                                <p class="font-semibold text-sm sm:text-base text-stone-800 dark:text-stone-100">
+                                    <?php echo e($post->user->name); ?></p>
+                                <p class="text-xs sm:text-sm text-stone-500 dark:text-stone-400">
+                                    <?php echo e($post->created_at->diffForHumans()); ?></p>
                             </div>
                         </div>
 
                         
-                        <p class="mt-2 text-sm sm:text-base text-stone-700 leading-relaxed whitespace-pre-wrap">
-                            <?php echo e($post->content); ?></p>
+                        <p
+                            class="mt-2 text-sm sm:text-base text-stone-700 dark:text-stone-300 leading-relaxed whitespace-pre-wrap">
+                            <?php echo e($post->content); ?>
+
+                        </p>
 
                         
                         <div class="mt-3 flex flex-col gap-4">
@@ -88,11 +97,12 @@
                         </div>
 
                         
-                        <div class="flex items-center justify-center gap-6 mt-4 border-t border-stone-100 pt-3 flex-wrap">
+                        <div
+                            class="flex items-center justify-center gap-6 mt-4 border-t border-stone-100 dark:border-stone-800 pt-3 flex-wrap">
                             <?php if(auth()->guard()->check()): ?>
                                 <button title="Tap" data-tap-post="<?php echo e($post->id); ?>"
                                     onclick="toggleCommunityTap(<?php echo e($post->id); ?>, this)"
-                                    class="flex items-center gap-2 px-3 py-1 rounded-full text-sm transition <?php echo e($post->taps()->where('user_id', auth()->id())->exists() ? 'bg-red-50 text-red-600' : 'text-stone-600 hover:bg-stone-50'); ?>">
+                                    class="flex items-center gap-2 px-3 py-1 rounded-full text-sm transition <?php echo e($post->taps()->where('user_id', auth()->id())->exists() ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400' : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'); ?>">
                                     <i data-lucide="heart"
                                         class="w-5 h-5 <?php echo e($post->taps()->where('user_id', auth()->id())->exists() ? 'fill-current' : ''); ?>"></i>
                                     <span id="tap-count-<?php echo e($post->id); ?>"
@@ -100,28 +110,28 @@
                                 </button>
                             <?php else: ?>
                                 <a href="<?php echo e(route('login')); ?>"
-                                    class="flex items-center gap-2 px-3 py-1 rounded-full text-sm text-stone-400 hover:text-amber-600 transition">
+                                    class="flex items-center gap-2 px-3 py-1 rounded-full text-sm text-stone-400 dark:text-stone-500 hover:text-amber-600 dark:hover:text-amber-500 transition">
                                     <i data-lucide="heart" class="w-5 h-5"></i>
                                     <span class="text-sm font-medium"><?php echo e($post->taps()->count()); ?></span>
                                 </a>
                             <?php endif; ?>
 
                             <button title="Comments" onclick="toggleCommentsBox(<?php echo e($post->id); ?>)"
-                                class="flex items-center gap-2 px-3 py-1 rounded-full text-sm text-stone-600 hover:bg-stone-50 transition">
+                                class="flex items-center gap-2 px-3 py-1 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                                 <i data-lucide="message-square" class="w-5 h-5"></i>
                                 <span id="comment-count-<?php echo e($post->id); ?>"
                                     class="text-sm font-medium"><?php echo e($post->comments()->count()); ?></span>
                             </button>
 
                             <button title="Save"
-                                class="flex items-center gap-2 px-3 py-1 rounded-full text-sm text-stone-600 hover:bg-stone-50 transition">
+                                class="flex items-center gap-2 px-3 py-1 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                                 <i data-lucide="bookmark" class="w-5 h-5"></i>
                                 <span class="text-sm"></span>
                             </button>
 
                             <button title="Share"
                                 onclick="openShareModal('<?php echo e(url('/communities/' . $community->id . '?post=' . $post->id)); ?>', '<?php echo e(addslashes(Str::limit($post->content ?? '', 120))); ?>')"
-                                class="flex items-center gap-2 px-3 py-1 rounded-full text-sm text-stone-600 hover:bg-stone-50 transition">
+                                class="flex items-center gap-2 px-3 py-1 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                                 <i data-lucide="share-2" class="w-5 h-5"></i>
                                 <span class="text-sm"></span>
                             </button>
@@ -132,14 +142,16 @@
                             <?php $__currentLoopData = $post->comments()->latest()->limit(50)->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $comment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="flex gap-3 items-start">
                                     <img src="<?php echo e($comment->user->profile_photo_url); ?>" class="w-9 h-9 rounded-full object-cover">
-                                    <div class="bg-stone-50 rounded-2xl p-4 flex-1">
+                                    <div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-4 flex-1">
                                         <div class="flex items-center justify-between">
                                             <div>
-                                                <p class="text-sm font-medium text-stone-800"><?php echo e($comment->user->name); ?></p>
-                                                <p class="text-xs text-stone-400"><?php echo e($comment->created_at->diffForHumans()); ?></p>
+                                                <p class="text-sm font-medium text-stone-800 dark:text-stone-100">
+                                                    <?php echo e($comment->user->name); ?></p>
+                                                <p class="text-xs text-stone-400 dark:text-stone-500">
+                                                    <?php echo e($comment->created_at->diffForHumans()); ?></p>
                                             </div>
                                         </div>
-                                        <p class="mt-2 text-sm text-stone-700"><?php echo e($comment->content); ?></p>
+                                        <p class="mt-2 text-sm text-stone-700 dark:text-stone-300"><?php echo e($comment->content); ?></p>
                                         <div class="mt-2 text-xs text-stone-500 flex gap-3">
                                             <button onclick="replyComment(<?php echo e($comment->id); ?>)"
                                                 class="hover:text-amber-600">Reply</button>
@@ -153,15 +165,15 @@
                                     <?php echo csrf_field(); ?>
                                     <input id="comment-input-<?php echo e($post->id); ?>" name="content" type="text"
                                         placeholder="Write a comment..."
-                                        class="flex-1 px-4 py-3 rounded-full border border-stone-300 text-sm sm:text-base focus:ring-2 focus:ring-amber-300">
+                                        class="flex-1 px-4 py-3 rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 placeholder-stone-400 align-middle focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all text-sm md:text-base">
                                     <button type="submit"
                                         class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full text-sm sm:text-base">
                                         <i data-lucide="send" class="w-5 h-5"></i>
                                     </button>
                                 </form>
                             <?php else: ?>
-                                <div class="mt-3 text-xs sm:text-sm text-stone-500">
-                                    <a href="<?php echo e(route('login')); ?>" class="text-amber-600">Log in</a> to comment.
+                                <div class="mt-3 text-xs sm:text-sm text-stone-500 dark:text-stone-400">
+                                    <a href="<?php echo e(route('login')); ?>" class="text-amber-600 dark:text-amber-500">Log in</a> to comment.
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -185,24 +197,30 @@
         <div class="space-y-6">
 
             
-            <div class="bg-white rounded-2xl shadow-md border border-stone-100">
+            <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-md border border-stone-100 dark:border-stone-800">
                 
-                <div class="relative h-56 sm:h-64 lg:h-72 rounded-t-2xl overflow-hidden">
+                <div class="relative h-56 sm:h-64 lg:h-72 rounded-t-2xl overflow-hidden bg-stone-100 dark:bg-stone-800">
                     <img src="<?php echo e($community->image ? asset('storage/' . $community->image) : asset('images/community-default.jpg')); ?>"
                         class="w-full h-full object-cover" alt="<?php echo e($community->name); ?>">
                 </div>
 
                 
                 <div class="p-5">
-                    <h2 class="text-lg sm:text-xl font-semibold text-stone-800"><?php echo e($community->name); ?></h2>
-                    <p class="text-xs sm:text-sm text-stone-500 mt-1"><?php echo e($community->members()->count()); ?> members •
-                        <?php echo e($posts->total() ?? $community->communityPosts()->count()); ?> posts</p>
-                    <p class="text-sm sm:text-base text-stone-600 mt-2"><?php echo e($community->description); ?></p>
+                    <h2 class="text-lg sm:text-xl font-semibold text-stone-800 dark:text-stone-100"><?php echo e($community->name); ?>
+
+                    </h2>
+                    <p class="text-xs sm:text-sm text-stone-500 dark:text-stone-400 mt-1">
+                        <?php echo e($community->members()->count()); ?> members •
+                        <?php echo e($posts->total() ?? $community->communityPosts()->count()); ?> posts
+                    </p>
+                    <p class="text-sm sm:text-base text-stone-600 dark:text-stone-300 mt-2"><?php echo e($community->description); ?>
+
+                    </p>
 
                     
                     <div class="mt-4 flex flex-col gap-2">
                         <a href=""
-                            class="w-full px-4 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm sm:text-base hover:bg-stone-50 text-center transition">View
+                            class="w-full px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-sm sm:text-base hover:bg-stone-50 dark:hover:bg-stone-800 text-center transition">View
                             Activity / Settings</a>
 
                         <?php if(auth()->guard()->check()): ?>
@@ -229,12 +247,12 @@
             </div>
 
             
-            <div class="bg-white rounded-2xl shadow-md border border-stone-100 p-5">
-                <h3 class="font-semibold text-stone-800 mb-3">Members</h3>
+            <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-md border border-stone-100 dark:border-stone-800 p-5">
+                <h3 class="font-semibold text-stone-800 dark:text-stone-100 mb-3">Members</h3>
                 <div class="grid grid-cols-4 gap-3">
                     <?php $__currentLoopData = $community->members->take(8); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $member): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <img src="<?php echo e($member->profile_photo_url); ?>"
-                            class="w-14 h-14 rounded-full mx-auto object-cover border border-stone-100">
+                            class="w-14 h-14 rounded-full mx-auto object-cover border border-stone-100 dark:border-stone-700">
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
@@ -277,17 +295,17 @@
                 const newComment = document.createElement('div');
                 newComment.className = 'flex gap-3 items-start';
                 newComment.innerHTML = `
-                <img src="${data.user.profile_photo_url || '/images/default-avatar.png'}" class="w-8 h-8 rounded-full">
-                <div class="bg-stone-50 rounded-2xl p-4 flex-1">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-stone-800">${data.user.name}</p>
-                            <p class="text-xs text-stone-400">Just now</p>
+                    <img src="${data.user.profile_photo_url || '/images/default-avatar.png'}" class="w-8 h-8 rounded-full">
+                    <div class="bg-stone-50 rounded-2xl p-4 flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-stone-800">${data.user.name}</p>
+                                <p class="text-xs text-stone-400">Just now</p>
+                            </div>
                         </div>
+                        <p class="mt-2 text-sm text-stone-700">${data.content}</p>
                     </div>
-                    <p class="mt-2 text-sm text-stone-700">${data.content}</p>
-                </div>
-            `;
+                `;
                 commentsBox.prepend(newComment);
                 document.getElementById(`comment-count-${postId}`).textContent = parseInt(document.getElementById(`comment-count-${postId}`).textContent) + 1;
                 input.value = '';

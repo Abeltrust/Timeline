@@ -7,16 +7,16 @@
         <?php if(auth()->guard()->guest()): ?>
             <!-- Welcome Section for Guests -->
             <div
-                class="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 rounded-2xl p-6 sm:p-8 border border-amber-200 mb-8">
+                class="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-stone-800 dark:via-stone-900 dark:to-stone-800 rounded-2xl p-6 sm:p-8 border border-amber-200 dark:border-stone-700 mb-8">
                 <div class="text-center mb-8">
                     <div
                         class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i data-lucide="book-open" class="w-7 h-7 sm:w-8 sm:h-8 text-white"></i>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-bold text-stone-800 mb-3">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-white mb-3">
                         Welcome to Timeline
                     </h2>
-                    <p class="text-base sm:text-lg text-stone-600 leading-relaxed max-w-2xl mx-auto">
+                    <p class="text-base sm:text-lg text-stone-600 dark:text-stone-400 leading-relaxed max-w-2xl mx-auto">
                         Your life. Your culture. Your story. A new kind of social platform designed to capture
                         the complete story of your journey while preserving the heritage that shapes us all.
                     </p>
@@ -28,8 +28,9 @@
                         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                             <i data-lucide="book-open" class="w-6 h-6 text-blue-600"></i>
                         </div>
-                        <h3 class="font-semibold text-stone-800 mb-2">Authentic Stories</h3>
-                        <p class="text-sm text-stone-600">Share your real journey chronologically, not algorithmically</p>
+                        <h3 class="font-semibold text-stone-800 dark:text-stone-200 mb-2">Authentic Stories</h3>
+                        <p class="text-sm text-stone-600 dark:text-stone-400">Share your real journey chronologically, not
+                            algorithmically</p>
                     </div>
 
                     <div class="text-center">
@@ -71,13 +72,14 @@
             <div class="mb-8">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-stone-800 mb-1">Your Timeline</h2>
-                        <p class="text-stone-600 text-sm sm:text-base">Stories unfolding in real time, just as life happens.</p>
+                        <h2 class="text-xl sm:text-2xl font-bold text-stone-800 dark:text-white mb-1">Your Timeline</h2>
+                        <p class="text-stone-600 dark:text-stone-400 text-sm sm:text-base">Stories unfolding in real time, just
+                            as life happens.</p>
                     </div>
                 </div>
                 <div class="flex space-x-2 overflow-x-auto scrollbar-hide pb-2">
                     <a href="<?php echo e(route('timeline.index', ['filter' => 'all'])); ?>"
-                        class="flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition <?php echo e($filter === 'all' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-300'); ?>">
+                        class="flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition <?php echo e($filter === 'all' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:border-stone-300'); ?>">
                         Stories
                     </a>
                     <a href="<?php echo e(route('timeline.index', ['filter' => 'lockedin'])); ?>"
@@ -96,7 +98,7 @@
         <div class="space-y-6">
             <?php $__empty_1 = true; $__currentLoopData = $posts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $post): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <article
-                    class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-stone-100 hover:shadow-md transition-all duration-300">
+                    class="bg-white dark:bg-stone-900/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm border border-stone-100 dark:border-stone-800 hover:shadow-md transition-all duration-300">
                     <div class="flex flex-col sm:flex-row items-start sm:space-x-4">
                         <!-- Post Content -->
                         <div class="flex-1 w-full">
@@ -111,14 +113,15 @@
 
                                     <!-- User Info -->
                                     <a href="<?php echo e(route('profile.user', $post->user)); ?>"
-                                        class="font-semibold text-stone-800 hover:text-amber-600">
+                                        class="font-semibold text-stone-800 dark:text-stone-200 hover:text-amber-600">
                                         <?php echo e($post->user->name); ?>
 
                                     </a>
                                     <span class="text-stone-400 text-xs sm:text-sm">@ <?php echo e($post->user->username); ?></span>
 
                                     <?php if($post->user->location): ?>
-                                        <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">
+                                        <span
+                                            class="text-xs bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-2 py-0.5 rounded-full">
                                             <?php echo e($post->user->location); ?>
 
                                         </span>
@@ -156,7 +159,8 @@
 
                             <!-- Body -->
                             <div class="mb-4">
-                                <p class="text-stone-700 leading-relaxed text-sm sm:text-base"><?php echo e($post->content); ?></p>
+                                <p class="text-stone-700 dark:text-stone-300 leading-relaxed text-sm sm:text-base">
+                                    <?php echo e($post->content); ?></p>
                                 <?php if($post->image): ?>
                                     <div class="mt-4 rounded-xl overflow-hidden">
                                         <img src="<?php echo e(Storage::url($post->image)); ?>"
@@ -167,12 +171,12 @@
 
                             <!-- Actions -->
                             <div
-                                class="flex flex-wrap justify-center items-center gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-stone-100 text-xs sm:text-sm md:text-base">
+                                class="flex flex-wrap justify-center items-center gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-stone-100 dark:border-stone-800 text-xs sm:text-sm md:text-base">
                                 <?php if(auth()->guard()->check()): ?>
                                     <!-- TAP -->
                                     <button onclick="toggleTap(<?php echo e($post->id); ?>)" data-tap-post="<?php echo e($post->id); ?>"
                                         class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition 
-                                                                        <?php echo e(auth()->user()->hasTapped($post) ? 'bg-red-50 text-red-600' : 'text-stone-600 hover:bg-stone-100'); ?>">
+                                                                                    <?php echo e(auth()->user()->hasTapped($post) ? 'bg-red-50 text-red-600' : 'text-stone-600 hover:bg-stone-100'); ?>">
                                         <i data-lucide="heart"
                                             class="w-3 h-3 sm:w-4 sm:h-4 <?php echo e(auth()->user()->hasTapped($post) ? 'fill-current' : ''); ?>"></i>
                                         <span class="font-medium" data-tap-count="<?php echo e($post->id); ?>">
@@ -186,12 +190,12 @@
                                         class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-stone-600 hover:bg-stone-100">
                                         <i data-lucide="message-circle" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                                         <span class="font-medium"
-                                            data-resonance-count="<?php echo e($post->id); ?>"><?php echo e($post->resonances->count()); ?> </span>
+                                            data-resonance-count="<?php echo e($post->id); ?>"><?php echo e($post->resonances->count()); ?> Resonance</span>
                                     </button>
 
                                     <!-- Check-In -->
                                     <button onclick="toggleCheckin(<?php echo e($post->id); ?>)" data-checkin-post="<?php echo e($post->id); ?>"
-                                        class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-stone-600 hover:bg-stone-100">
+                                        class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition <?php echo e(auth()->user()->hasCheckedIn($post) ? 'text-green-600' : 'text-stone-600 hover:bg-stone-100'); ?>">
                                         <i data-lucide="check-circle" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                                         <span class="font-medium" data-checkin-count="<?php echo e($post->id); ?>">
                                             <?php echo e($post->check_ins_count); ?>
@@ -213,12 +217,13 @@
                             <div id="resonance-box-<?php echo e($post->id); ?>" class="hidden mt-4">
                                 <div class="space-y-2 sm:space-y-3">
                                     <?php $__currentLoopData = $post->resonances; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $resonance): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <div class="p-2 sm:p-3 bg-stone-50 rounded-lg">
+                                        <div class="p-2 sm:p-3 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                                             <span
-                                                class="font-medium text-stone-800 text-xs sm:text-sm text-strong"><?php echo e($resonance->user->name); ?></span>
-                                            <p class="text-stone-700 text-xs sm:text-sm leading-snug"><?php echo e($resonance->content); ?></p>
+                                                class="font-medium text-stone-800 dark:text-stone-200 text-xs sm:text-sm text-strong"><?php echo e($resonance->user->name); ?></span>
+                                            <p class="text-stone-700 dark:text-stone-400 text-xs sm:text-sm leading-snug">
+                                                <?php echo e($resonance->content); ?></p>
                                             <span
-                                                class="text-[10px] sm:text-xs text-stone-500"><?php echo e($resonance->created_at->diffForHumans()); ?></span>
+                                                class="text-[10px] sm:text-xs text-stone-500 dark:text-stone-500"><?php echo e($resonance->created_at->diffForHumans()); ?></span>
                                         </div>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
@@ -226,7 +231,7 @@
                                 <?php if(auth()->guard()->check()): ?>
                                     <div class="flex items-center mt-2 sm:mt-3 space-x-1 sm:space-x-2">
                                         <input type="text" id="resonance-input-<?php echo e($post->id); ?>" placeholder="Write a resonance..."
-                                            class="flex-1 border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                                            class="flex-1 border dark:border-stone-700 bg-white dark:bg-stone-900 dark:text-stone-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
                                         <button onclick="submitResonance(<?php echo e($post->id); ?>)"
                                             class="p-2 sm:p-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition flex items-center justify-center">
                                             <i data-lucide="send" class="w-4 h-4 sm:w-5 sm:h-5"></i>
@@ -255,9 +260,10 @@
     </div>
 
     <!-- Share Modal -->
-    <div id="shareModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-3 sm:p-0">
+    <div id="shareModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-3 sm:p-0">
         <div
-            class="bg-white rounded-xl sm:rounded-2xl shadow-lg w-full max-w-sm sm:max-w-md p-4 sm:p-6 relative text-xs sm:text-sm">
+            class="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-md p-4 sm:p-6 relative text-xs sm:text-sm border dark:border-stone-800">
             <!-- Close Button -->
             <button onclick="closeShareModal()"
                 class="absolute top-2 right-2 sm:top-3 sm:right-3 text-gray-500 hover:text-gray-700">
@@ -265,7 +271,8 @@
             </button>
 
             <!-- Header -->
-            <h2 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+            <h2
+                class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-stone-800 dark:text-stone-100">
                 <i data-lucide="share-2" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 Share this story
             </h2>
@@ -273,8 +280,8 @@
             <!-- Share Options -->
             <div class="space-y-2 sm:space-y-3">
                 <button onclick="copyLink()"
-                    class="flex items-center gap-2 sm:gap-3 w-full bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-lg transition">
-                    <i data-lucide="copy" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600"></i>
+                    class="flex items-center gap-2 sm:gap-3 w-full bg-gray-100 dark:bg-stone-800 hover:bg-gray-200 dark:hover:bg-stone-700 p-2 sm:p-3 rounded-lg transition text-stone-700 dark:text-stone-300">
+                    <i data-lucide="copy" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-stone-400"></i>
                     <span class="text-xs sm:text-sm">Copy Link</span>
                 </button>
 
@@ -335,7 +342,7 @@
         function toggleTap(postId) {
             let btn = document.querySelector(`[data-tap-post="${postId}"]`);
             let countSpan = document.querySelector(`[data-tap-count="${postId}"]`);
-            let icon = btn.querySelector('i');
+            let icon = btn.querySelector('i, svg');
 
             // Optimistic UI update
             let isTapped = btn.classList.contains('text-red-600');
@@ -388,11 +395,11 @@
         function toggleCheckin(postId) {
             let btn = document.querySelector(`[data-checkin-post="${postId}"]`);
             let countSpan = document.querySelector(`[data-checkin-count="${postId}"]`);
-            
+
             // Optimistic UI update
             let isCheckedIn = btn.classList.contains('text-green-600');
             let currentCount = parseInt(countSpan.textContent) || 0;
-            
+
             if (isCheckedIn) {
                 btn.classList.remove('text-green-600');
                 countSpan.textContent = Math.max(0, currentCount - 1);
@@ -451,12 +458,12 @@
                         const box = document.querySelector(`#resonance-box-${postId} .space-y-2, #resonance-box-${postId} .space-y-3`);
                         if (box) {
                             box.insertAdjacentHTML('beforeend', `
-                                    <div class="p-2 sm:p-3 bg-stone-50 rounded-lg">
-                                        <span class="font-medium text-stone-800 text-xs sm:text-sm">${data.resonance.user.name}</span>
-                                        <p class="text-stone-700 text-xs sm:text-sm leading-snug">${data.resonance.content}</p>
-                                        <span class="text-[10px] sm:text-xs text-stone-500">${data.resonance.time}</span>
-                                    </div>
-                                `);
+                                        <div class="p-2 sm:p-3 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
+                                            <span class="font-medium text-stone-800 dark:text-stone-200 text-xs sm:text-sm">${data.resonance.user.name}</span>
+                                            <p class="text-stone-700 dark:text-stone-400 text-xs sm:text-sm leading-snug">${data.resonance.content}</p>
+                                            <span class="text-[10px] sm:text-xs text-stone-500 dark:text-stone-500">${data.resonance.time}</span>
+                                        </div>
+                                    `);
                         }
                         input.value = '';
                         document.querySelector(`[data-resonance-count="${postId}"]`).innerText = `${data.count} Resonance`;

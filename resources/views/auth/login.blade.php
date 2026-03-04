@@ -3,8 +3,9 @@
 @section('title', 'Login - Timeline')
 
 @section('content')
-    <div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
-        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+    <div
+        class="flex items-center justify-center min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-stone-900 dark:via-stone-950 dark:to-stone-900">
+        <div class="bg-white dark:bg-stone-900 p-8 rounded-2xl shadow-lg w-full max-w-md border dark:border-stone-800">
             <h2 class="text-2xl font-bold text-center mb-6 text-amber-500">Welcome Back</h2>
 
             <!-- Login Form -->
@@ -13,13 +14,14 @@
 
                 <!-- Email -->
                 <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-stone-700">Email</label>
+                    <label for="email" class="block text-sm font-medium text-stone-700 dark:text-stone-300">Email</label>
                     <div class="mt-1 relative">
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-stone-400">
                             <i data-lucide="mail" class="w-4 h-4"></i>
                         </span>
                         <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                            class="pl-10 py-3 block w-full stnd-input px-4" placeholder="your@email.com">
+                            class="pl-10 py-3 block w-full stnd-input px-4 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder-stone-500"
+                            placeholder="your@email.com">
                     </div>
                     @error('email')
                         <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
@@ -28,13 +30,15 @@
 
                 <!-- Password -->
                 <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-stone-700">Password</label>
+                    <label for="password"
+                        class="block text-sm font-medium text-stone-700 dark:text-stone-300">Password</label>
                     <div class="mt-1 relative">
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-stone-400">
                             <i data-lucide="lock" class="w-4 h-4"></i>
                         </span>
                         <input id="password" type="password" name="password" required
-                            class="pl-10 py-3 block w-full stnd-input px-4" placeholder="Your password">
+                            class="pl-10 py-3 block w-full stnd-input px-4 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder-stone-500"
+                            placeholder="Your password">
                     </div>
                     @error('password')
                         <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
@@ -54,7 +58,7 @@
                     password?</a>
             </div>
             <div class="mt-2 text-center">
-                <p class="text-sm text-stone-600">
+                <p class="text-sm text-stone-600 dark:text-stone-400">
                     Don’t have an account?
                     <a href="{{ route('register') }}" class="font-medium text-amber-600 hover:underline">Join Timeline</a>
                 </p>
