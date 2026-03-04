@@ -321,6 +321,7 @@
 
     <!-- Create Post Modal -->
     @auth
+    @include('partials.image-compression')
     <div id="createPostModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white dark:bg-stone-900 rounded-none md:rounded-2xl w-[95%] sm:w-[90%] md:w-full h-[90vh] md:h-auto md:max-w-2xl md:max-h-[90vh] overflow-y-auto mx-auto shadow-lg">
         <!-- Header -->
@@ -332,7 +333,9 @@
         </div>
 
         <!-- Form -->
-        <form action="{{ route('timeline.store') }}" method="POST" enctype="multipart/form-data" class="p-4 md:p-6 space-y-4 text-sm md:text-base">
+        <form action="{{ route('timeline.store') }}" method="POST" enctype="multipart/form-data" 
+              @submit.prevent="if(await handleFormImageCompression($el)) $el.submit()"
+              class="p-4 md:p-6 space-y-4 text-sm md:text-base">
             @csrf
 
             <!-- User Info -->

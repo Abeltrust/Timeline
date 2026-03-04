@@ -27,7 +27,9 @@
                 </button>
             </div>
 
-            <form action="{{ route('live-stream.store') }}" method="POST" enctype="multipart/form-data">
+        @include('partials.image-compression')
+            <form action="{{ route('live-stream.store') }}" method="POST" enctype="multipart/form-data"
+                @submit.prevent="if(await handleFormImageCompression($el)) $el.submit()">
                 @csrf
 
                 <div class="space-y-4">
@@ -126,7 +128,10 @@
                                     <h3
                                         class="font-bold text-lg leading-tight line-clamp-1 group-hover:text-amber-400 transition-colors">
                                         {{ $stream->title }}</h3>
-                                    <p class="text-xs text-stone-300 mt-1 line-clamp-1">{{ $stream->host->name }}</p>
+                                    <a href="{{ route('profile.user', $stream->host) }}" class="text-xs text-stone-300 mt-1 line-clamp-1 hover:text-amber-400 transition-colors flex items-center gap-1 group/host">
+                                        Hosted by {{ $stream->host->name }}
+                                        <i data-lucide="external-link" class="w-3 h-3 opacity-0 group-hover/host:opacity-100 transition-opacity"></i>
+                                    </a>
                                 </div>
                             </div>
                         @if($stream->category || $stream->description)
@@ -139,6 +144,50 @@
                             </div>
                         @endif
                         </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        {{-- Recently Ended --}}
+        @if($endedStreams->count() > 0)
+            <div class="pt-4 border-t border-stone-200 dark:border-stone-800">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-stone-100 mb-4 flex items-center gap-2">
+                    <i data-lucide="history" class="w-5 h-5 text-stone-400"></i>
+                    Recently Ended
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($endedStreams as $stream)
+                        <div
+                            class="group block bg-white dark:bg-stone-900 rounded-2xl shadow-sm overflow-hidden border border-stone-200 dark:border-stone-800 transition-all duration-200 opacity-75 hover:opacity-100">
+                            <div class="relative">
+                                @if($stream->thumbnail)
+                                    <img src="{{ Storage::url($stream->thumbnail) }}" alt="Stream Thumbnail"
+                                        class="w-full h-40 object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                                @else
+                                    <div class="w-full h-40 bg-stone-200 dark:bg-stone-800 flex items-center justify-center p-6 text-center">
+                                        <span class="text-stone-400 font-bold text-xs leading-tight uppercase tracking-widest opacity-40">{{ $stream->title }}</span>
+                                    </div>
+                                @endif
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                <span
+                                    class="absolute top-3 left-3 bg-stone-600 text-white font-bold px-2 py-0.5 rounded text-[10px] tracking-wider uppercase flex items-center gap-1.5 shadow-sm">
+                                    ENDED
+                                </span>
+                                <div class="absolute bottom-3 left-3 right-3 text-white">
+                                    <h3 class="font-bold text-base leading-tight line-clamp-1 group-hover:text-amber-400 transition-colors">
+                                        {{ $stream->title }}</h3>
+                                    <p class="text-[10px] text-stone-300 mt-0.5 line-clamp-1">Hosted by {{ $stream->host->name }}</p>
+                                </div>
+                            </div>
+                            <div class="p-3">
+                                <p class="text-[10px] text-stone-500 font-medium italic">Ended {{ $stream->completed_at->diffForHumans() }}</p>
+                                <a href="{{ route('profile.user', $stream->host) }}" class="mt-2 text-[11px] text-amber-600 hover:text-amber-500 font-bold flex items-center gap-1 group/link">
+                                    View Host Profile
+                                    <i data-lucide="external-link" class="w-2.5 h-2.5 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"></i>
+                                </a>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             </div>
@@ -175,8 +224,9 @@
                                         {{ $stream->scheduled_at->format('M d, g:i A') }}
                                     </span>
                                 </div>
-                                <p class="text-sm text-stone-500 dark:text-stone-400 mb-2">Hosted by <span
-                                        class="font-medium text-stone-700 dark:text-stone-300">{{ $stream->host->name }}</span></p>
+                                <a href="{{ route('profile.user', $stream->host) }}" class="text-sm text-stone-500 dark:text-stone-400 mb-2 hover:text-amber-500 transition-colors group/host">
+                                    Hosted by <span class="font-medium text-stone-700 dark:text-stone-300 group-hover/host:text-amber-500 transition-colors">{{ $stream->host->name }}</span>
+                                </a>
                                 <p class="text-sm text-stone-600 dark:text-stone-300 line-clamp-2 mb-3">{{ $stream->description }}
                                 </p>
                                 @if($stream->category)

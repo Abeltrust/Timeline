@@ -16,13 +16,19 @@ class LiveStreamController extends Controller
             ->latest()
             ->get();
 
+        $endedStreams = LiveStream::where('is_live', false)
+            ->whereNotNull('completed_at')
+            ->where('completed_at', '>=', now()->subHours(12))
+            ->latest('completed_at')
+            ->get();
+
         $upcomingStreams = LiveStream::whereNotNull('scheduled_at')
             ->where('scheduled_at', '>', now())
             ->whereNull('completed_at')
             ->latest('scheduled_at')
             ->get();
 
-        return view('live-streaming.index', compact('liveStreams', 'upcomingStreams'));
+        return view('live-streaming.index', compact('liveStreams', 'upcomingStreams', 'endedStreams'));
     }
 
     public function show(LiveStream $stream)
@@ -76,5 +82,23 @@ class LiveStreamController extends Controller
         $stream->save();
 
         return redirect()->route('live-stream.index')->with('success', 'Live stream ended.');
+    }
+
+    /**
+     * End stream via AJAX/Beacon when user leaves page
+     */
+    public function ajaxEnd(LiveStream $stream)
+    {
+        if ($stream->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($stream->is_live) {
+            $stream->is_live = false;
+            $stream->completed_at = now();
+            $stream->save();
+        }
+
+        return response()->json(['success' => true]);
     }
 }

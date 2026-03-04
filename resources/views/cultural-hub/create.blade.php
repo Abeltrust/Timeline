@@ -22,10 +22,12 @@
                 stories.</p>
         </div>
 
+        @include('partials.image-compression')
+
         <form action="{{ route('cultural-hub.store') }}" method="POST" enctype="multipart/form-data"
+            @submit.prevent="if(await handleFormImageCompression($el)) $el.submit()"
             class="bg-white dark:bg-stone-900 rounded-[2.5rem] p-8 sm:p-12 shadow-2xl border border-stone-100 dark:border-stone-800 space-y-10">
             @csrf
-
             <div class="space-y-8">
                 <!-- Basic Info Section -->
                 <div class="space-y-6">
@@ -72,11 +74,11 @@
 
                     <!-- Description -->
                     <div x-data="{ 
-                                            content: '{{ old('description') }}',
-                                            wordCount() {
-                                                return this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
-                                            }
-                                        }">
+                                                    content: '{{ old('description') }}',
+                                                    wordCount() {
+                                                        return this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
+                                                    }
+                                                }">
                         <label for="description"
                             class="block text-[11px] font-black uppercase tracking-widest text-stone-500 mb-2 flex justify-between">
                             <span>Core Story / Description</span>
@@ -203,17 +205,17 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                         <div class="grid grid-cols-1 gap-8 items-start" x-data="{ 
-                                galleryPreviews: [],
-                                handleGallery(e) {
-                                    const files = Array.from(e.target.files).slice(0, 5);
-                                    this.galleryPreviews = [];
-                                    files.forEach(file => {
-                                        const reader = new FileReader();
-                                        reader.onload = (e) => this.galleryPreviews.push(e.target.result);
-                                        reader.readAsDataURL(file);
-                                    });
-                                }
-                            }">
+                                        galleryPreviews: [],
+                                        handleGallery(e) {
+                                            const files = Array.from(e.target.files).slice(0, 5);
+                                            this.galleryPreviews = [];
+                                            files.forEach(file => {
+                                                const reader = new FileReader();
+                                                reader.onload = (e) => this.galleryPreviews.push(e.target.result);
+                                                reader.readAsDataURL(file);
+                                            });
+                                        }
+                                    }">
                             <!-- Cover Image -->
                             <div>
                                 <label

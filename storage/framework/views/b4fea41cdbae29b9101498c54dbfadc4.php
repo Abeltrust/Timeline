@@ -3,7 +3,7 @@
 <?php $__env->startSection('title', 'Register - Timeline'); ?>
 
 <?php $__env->startSection('content'); ?>
-    <div class="max-w-md mx-auto mt-10 bg-white shadow-lg rounded-2xl p-6">
+    <div class="max-w-md mx-auto mt-10 bg-white dark:bg-stone-900 shadow-lg rounded-2xl p-6 border dark:border-stone-800">
         <h2 class="text-2xl font-bold mb-6 text-center text-amber-500 ">Register</h2>
 
         <form method="POST" action="<?php echo e(route('register')); ?>">
@@ -11,13 +11,14 @@
 
             <!-- Name -->
             <div class="mb-4 relative">
-                <label for="name" class="block text-sm font-medium text-stone-700 mb-1">Name</label>
+                <label for="name" class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">Name</label>
                 <div class="mt-1 relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-stone-400">
                         <i data-lucide="circle-user-round" class="w-5 h-5"></i>
                     </span>
                     <input id="name" type="text" name="name" value="<?php echo e(old('name')); ?>" required autofocus
-                        class="pl-10 py-3 block w-full stnd-input px-4" placeholder="name">
+                        class="pl-10 py-3 block w-full stnd-input px-4 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder-stone-500"
+                        placeholder="name">
                     <?php $__errorArgs = ['name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -33,13 +34,15 @@ unset($__errorArgs, $__bag); ?>
 
             <!-- Username -->
             <div class="mb-4 relative">
-                <label for="username" class="block text-sm font-medium text-stone-700 mb-1">Username</label>
+                <label for="username"
+                    class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">Username</label>
                 <div class="mt-1 relative">
                     <span class="mb-1 absolute inset-y-0 left-0 pl-3 flex items-center text-stone-400">
                         <i data-lucide="user" class="w-5 h-5"></i>
                     </span>
                     <input id="username" type="text" name="username" value="<?php echo e(old('username')); ?>" required
-                        class="pl-10 py-3 block w-full stnd-input px-4" placeholder="username">
+                        class="pl-10 py-3 block w-full stnd-input px-4 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder-stone-500"
+                        placeholder="username">
                     <?php $__errorArgs = ['username'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -55,13 +58,14 @@ unset($__errorArgs, $__bag); ?>
 
             <!-- Email -->
             <div class="mb-4 relative">
-                <label for="email" class="block text-sm font-medium text-stone-700 mb-1">Email</label>
+                <label for="email" class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">Email</label>
                 <div class="mt-1 relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-stone-400">
                         <i data-lucide="mail" class="w-5 h-5"></i>
                     </span>
                     <input id="email" type="email" name="email" value="<?php echo e(old('email')); ?>" required
-                        class="pl-10 py-3 block w-full stnd-input px-4" placeholder="your@email.com">
+                        class="pl-10 py-3 block w-full stnd-input px-4 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder-stone-500"
+                        placeholder="your@email.com">
                     <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -77,13 +81,15 @@ unset($__errorArgs, $__bag); ?>
 
             <!-- Password -->
             <div class="mb-4 relative" x-data="{ show: false }">
-                <label for="password" class="block text-sm font-medium text-stone-700 mb-1">Password</label>
+                <label for="password"
+                    class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">Password</label>
                 <div class="mt-1 relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-stone-400">
                         <i data-lucide="lock" class="w-5 h-5"></i>
                     </span>
                     <input id="password" :type="show ? 'text' : 'password'" name="password" required
-                        class="pl-10 py-3 block w-full stnd-input px-4" placeholder="Your password">
+                        class="pl-10 py-3 block w-full stnd-input px-4 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder-stone-500"
+                        placeholder="Your password">
                     <button type="button" class="absolute inset-y-0 right-3 text-sm text-gray-500" @click="show = !show"
                         tabindex="-1">
                         <span x-show="!show">👁</span>
@@ -104,14 +110,17 @@ unset($__errorArgs, $__bag); ?>
 
             <!-- Confirm Password -->
             <div class="mb-6 relative" x-data="{ show: false }">
-                <label for="password_confirmation" class="block text-sm font-medium text-stone-700 mb-1">Confirm
+                <label for="password_confirmation"
+                    class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">Confirm
                     Password</label>
                 <div class="mt-1 relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-stone-400">
                         <i data-lucide="lock" class="w-5 h-5"></i>
                     </span>
                     <input id="password_confirmation" :type="show ? 'text' : 'password'" name="password_confirmation"
-                        required class="pl-10 py-3 block w-full stnd-input px-4" placeholder="confirmation password">
+                        required
+                        class="pl-10 py-3 block w-full stnd-input px-4 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder-stone-500"
+                        placeholder="confirmation password">
                     <button type="button" class="absolute inset-y-0 right-3 text-sm text-gray-500" @click="show = !show"
                         tabindex="-1">
                         <span x-show="!show">👁</span>
@@ -132,7 +141,7 @@ unset($__errorArgs, $__bag); ?>
                     password?</a>
             </div>
             <div class="mt-2 text-center">
-                <p class="text-sm text-stone-600">
+                <p class="text-sm text-stone-600 dark:text-stone-400">
                     Already have an account?
                     <a href="<?php echo e(route('login')); ?>" class="font-medium text-amber-600 hover:underline">Login</a>
                 </p>

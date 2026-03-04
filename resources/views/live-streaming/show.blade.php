@@ -3,7 +3,7 @@
 
 @section('content')
     <div id="live-stream-root" class="h-[calc(100vh-4rem)] bg-stone-950 flex flex-col md:flex-row overflow-hidden relative"
-        x-data="{ showChat: true, replyingTo: null, replyAuthor: '' }">
+        x-data="chatComponent()">
 
         {{-- Main Video Area --}}
         <div class="flex-1 flex flex-col relative transition-all duration-300 h-[60vh] md:h-full">
@@ -31,18 +31,18 @@
                             <i data-lucide="arrow-left" class="w-5 h-5"></i>
                         </a>
                         <div>
-                            <h1 class="text-white font-bold text-lg md:text-xl drop-shadow-md flex items-center gap-2">
+                            <h1 class="text-white font-bold text-lg md:text-sm drop-shadow-md flex items-center gap-2">
                                 {{ $stream->title }}
                                 @if(auth()->id() === $stream->user_id && $stream->is_live)
                                     <span
                                         class="bg-red-600 text-white text-[10px] uppercase font-black px-2 py-0.5 rounded shadow-lg flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                                        <span class="w-1 h-1 bg-white rounded-full animate-pulse"></span>
                                         You're Live
                                     </span>
                                 @elseif($stream->is_live)
                                     <span
                                         class="bg-red-600 text-white text-[10px] uppercase font-black px-2 py-0.5 rounded shadow-lg flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                                        <span class="w-1 h-1 bg-white rounded-full animate-pulse"></span>
                                         Live
                                     </span>
                                 @else
@@ -50,11 +50,12 @@
                                         class="bg-stone-600 text-white text-[10px] uppercase font-black px-2 py-0.5 rounded shadow-lg">Ended</span>
                                 @endif
                             </h1>
-                            <p class="text-stone-300 text-sm flex items-center gap-2">
+                            <a href="{{ route('profile.user', $stream->host) }}" class="text-stone-300 text-sm flex items-center gap-2 hover:text-amber-500 transition-colors group">
                                 <img src="{{ $stream->host->profile_photo_url }}"
-                                    class="w-5 h-5 rounded-full border border-white/20">
+                                    class="w-5 h-5 rounded-full border border-white/20 group-hover:border-amber-500/50">
                                 {{ $stream->host->name }}
-                            </p>
+                                <i data-lucide="external-link" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </a>
                         </div>
                     </div>
 
@@ -74,13 +75,13 @@
                 @if(auth()->id() === $stream->user_id && $stream->is_live)
                     <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-black/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10"
                         x-data="{ micOn: true, camOn: true }">
-                        <button @click="toggleMic(); micOn = !micOn"
+                        <button @click="toggleMicGlobal(); micOn = !micOn"
                             :class="micOn ? 'bg-white/10 hover:bg-white/20' : 'bg-red-500/80 hover:bg-red-600/80'"
                             class="w-12 h-12 rounded-full text-white flex items-center justify-center transition"
                             title="Toggle Microphone">
                             <i :data-lucide="micOn ? 'mic' : 'mic-off'" class="w-5 h-5"></i>
                         </button>
-                        <button @click="toggleCam(); camOn = !camOn"
+                        <button @click="toggleCamGlobal(); camOn = !camOn"
                             :class="camOn ? 'bg-white/10 hover:bg-white/20' : 'bg-red-500/80 hover:bg-red-600/80'"
                             class="w-12 h-12 rounded-full text-white flex items-center justify-center transition"
                             title="Toggle Camera">
@@ -89,7 +90,7 @@
                         <form action="{{ route('live-stream.end', $stream) }}" method="POST" class="inline"
                             id="end-stream-form">
                             @csrf
-                            <button type="submit" @click="stopStream()"
+                            <button type="submit" @click="stopStreamGlobal()"
                                 class="h-12 px-6 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm tracking-wide transition flex items-center gap-2">
                                 <i data-lucide="phone-off" class="w-4 h-4"></i> End Stream
                             </button>
@@ -135,24 +136,24 @@
                     <span class="text-[10px] font-black text-amber-500 uppercase tracking-widest">Replying to</span>
                     <span class="text-xs text-stone-300 truncate max-w-[200px]" x-text="replyAuthor"></span>
                 </div>
-                <button @click="replyingTo = null; replyAuthor = ''" class="text-stone-500 hover:text-white transition">
+                <button @click="cancelReply" class="text-stone-500 hover:text-white transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
             <div class="p-3 bg-stone-900 border-t border-stone-800 mt-auto flex items-center gap-2">
                 @if($stream->is_live)
-                    <div class="relative flex-1">
-                        <input type="text" id="chat-input" placeholder="Send a message..."
+                    <form @submit.prevent="sendMessage" class="relative flex-1">
+                        <input type="text" id="chat-input" placeholder="Send a message..." x-model="messageBody"
                             class="w-full bg-stone-950 border border-stone-800 text-stone-100 rounded-full pl-4 pr-12 py-2.5 text-sm focus:outline-none focus:border-amber-500 transition">
-                        <button onclick="sendMessage()"
+                        <button type="submit"
                             class="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-amber-600 hover:bg-amber-500 text-white rounded-full transition">
                             <i data-lucide="send" class="w-4 h-4 ml-0.5"></i>
                         </button>
-                    </div>
+                    </form>
 
                     {{-- Reaction Button --}}
-                    <button onclick="sendReaction()"
+                    <button @click="sendReaction"
                         class="w-10 h-10 rounded-full bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-amber-500 border border-stone-700 transition active:scale-90"
                         title="Send Love">
                         <i data-lucide="heart" class="w-5 h-5 fill-current"></i>
@@ -187,17 +188,18 @@
             lucide.createIcons();
         }
 
-        function toggleMic() {
+        // Global camera controls for host
+        window.toggleMicGlobal = () => {
             if (localStream) {
                 const audioTrack = localStream.getAudioTracks()[0];
                 if (audioTrack) {
                     audioTrack.enabled = !audioTrack.enabled;
-                    lucide.createIcons(); // refresh icons
+                    lucide.createIcons();
                 }
             }
-        }
+        };
 
-        function toggleCam() {
+        window.toggleCamGlobal = () => {
             if (localStream) {
                 const videoTrack = localStream.getVideoTracks()[0];
                 if (videoTrack) {
@@ -205,143 +207,169 @@
                     lucide.createIcons();
                 }
             }
-        }
+        };
 
-        function stopStream() {
+        window.stopStreamGlobal = () => {
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }
-        }
+        };
 
-        function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (!message) return;
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('chatComponent', () => ({
+                showChat: true,
+                replyingTo: null,
+                replyAuthor: '',
+                messageBody: '',
 
-            // Get reply state from Alpine
-            const root = document.getElementById('live-stream-root');
-            const alpineData = Alpine.find(root);
-            if (!alpineData) {
-                console.error("Alpine data not found for live-stream-root");
-                return;
-            }
-            const isReply = alpineData.replyingTo !== null;
-            const targetAuthor = alpineData.replyAuthor;
+                init() {
+                    initCamera();
+                    
+                    // Immediately end stream if host leaves
+                    @if(auth()->id() === $stream->user_id && $stream->is_live)
+                    window.addEventListener('visibilitychange', () => {
+                        if (document.visibilityState === 'hidden') {
+                            this.endStreamBeacon();
+                        }
+                    });
+                    window.addEventListener('pagehide', () => this.endStreamBeacon());
+                    @endif
 
-            const chatContainer = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'group flex flex-col mb-4 opacity-0 transform translate-y-2 transition-all duration-300';
+                    // Expose vibe function globally for onclick inside dynamic HTML
+                    window.vibeMessage = (btn) => this.vibeMessage(btn);
+                    window.initiateReplyFromGlobal = (author) => this.initiateReply(author);
+                },
 
-            let replyHTML = '';
-            if (isReply) {
-                replyHTML = `
-                                <div class="mb-1 text-[10px] text-stone-500 flex items-center gap-1">
-                                    <i data-lucide="corner-down-right" class="w-2.5 h-2.5"></i>
-                                    Replying to ${targetAuthor}
+                endStreamBeacon() {
+                    const url = "{{ route('live-stream.ajax-end', $stream) }}";
+                    const data = new FormData();
+                    data.append('_token', "{{ csrf_token() }}");
+                    navigator.sendBeacon(url, data);
+                    stopStreamGlobal();
+                },
+
+                sendMessage() {
+                    if (!this.messageBody.trim()) return;
+
+                    const message = this.messageBody.trim();
+                    const isReply = this.replyingTo !== null;
+                    const targetAuthor = this.replyAuthor;
+
+                    const chatContainer = document.getElementById('chat-messages');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'group flex flex-col mb-4 opacity-0 transform translate-y-2 transition-all duration-300';
+
+                    let replyHTML = '';
+                    if (isReply) {
+                        replyHTML = `
+                                    <div class="mb-1 text-[10px] text-stone-500 flex items-center gap-1">
+                                        <i data-lucide="corner-down-right" class="w-2.5 h-2.5"></i>
+                                        Replying to ${targetAuthor}
+                                    </div>
+                                `;
+                    }
+
+                    messageDiv.innerHTML = `
+                                ${replyHTML}
+                                <div class="flex items-start gap-2">
+                                    <div class="flex-1 bg-white/5 rounded-2xl rounded-tl-none p-3 border border-white/5">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-amber-500 font-bold text-xs">{{ auth()->user()->name }}</span>
+                                            <span class="text-[9px] text-stone-500">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
+                                        <p class="text-stone-200 text-sm whitespace-pre-wrap">${message}</p>
+                                    </div>
+
+                                    <div class="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onclick="vibeMessage(this)" class="p-1.5 rounded-lg hover:bg-white/10 text-stone-500 hover:text-red-500 transition active:scale-90" title="Vibe">
+                                            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button onclick="initiateReplyFromGlobal('${'{{ auth()->user()->name }}'}')" class="p-1.5 rounded-lg hover:bg-white/10 text-stone-500 hover:text-amber-500 transition" title="Reply">
+                                            <i data-lucide="reply" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             `;
-            }
 
-            messageDiv.innerHTML = `
-                            ${replyHTML}
-                            <div class="flex items-start gap-2">
-                                <div class="flex-1 bg-white/5 rounded-2xl rounded-tl-none p-3 border border-white/5">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-amber-500 font-bold text-xs">{{ auth()->user()->name }}</span>
-                                        <span class="text-[9px] text-stone-500">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                    </div>
-                                    <p class="text-stone-200 text-sm whitespace-pre-wrap">${message}</p>
-                                </div>
+                    chatContainer.appendChild(messageDiv);
 
-                                <div class="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onclick="vibeMessage(this)" class="p-1.5 rounded-lg hover:bg-white/10 text-stone-500 hover:text-red-500 transition active:scale-90" title="Vibe">
-                                        <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                    <button onclick="initiateReply('{{ auth()->user()->name }}', this)" class="p-1.5 rounded-lg hover:bg-white/10 text-stone-500 hover:text-amber-500 transition" title="Reply">
-                                        <i data-lucide="reply" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
+                    // Delay icon creation to avoid DOM jank during message rendering
+                    setTimeout(() => lucide.createIcons(), 50);
 
-            chatContainer.appendChild(messageDiv);
-            lucide.createIcons();
+                    // Animation
+                    setTimeout(() => {
+                        messageDiv.classList.remove('opacity-0', 'translate-y-2');
+                    }, 10);
 
-            // Animation
-            setTimeout(() => {
-                messageDiv.classList.remove('opacity-0', 'translate-y-2');
-            }, 10);
+                    // Reset State
+                    this.messageBody = '';
+                    this.replyingTo = null;
+                    this.replyAuthor = '';
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                },
 
-            // Reset Input and Reply State
-            input.value = '';
-            alpineData.replyingTo = null;
-            alpineData.replyAuthor = '';
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+                initiateReply(author) {
+                    this.replyAuthor = author;
+                    this.replyingTo = Date.now();
+                    document.getElementById('chat-input').focus();
+                },
 
-        function vibeMessage(btn) {
-            const icon = btn.querySelector('i');
-            icon.classList.toggle('text-red-500');
-            icon.classList.toggle('fill-red-500');
+                cancelReply() {
+                    this.replyingTo = null;
+                    this.replyAuthor = '';
+                },
 
-            // Floating heart on vibe
-            const rect = btn.getBoundingClientRect();
-            const vibeHeart = document.createElement('div');
-            vibeHeart.className = 'fixed pointer-events-none transition-all duration-700 ease-out z-[100]';
-            vibeHeart.style.left = `${rect.left + rect.width / 2}px`;
-            vibeHeart.style.top = `${rect.top}px`;
-            vibeHeart.innerHTML = '⚡';
-            vibeHeart.style.fontSize = '20px';
-            document.body.appendChild(vibeHeart);
+                vibeMessage(btn) {
+                    const icon = btn.querySelector('i, svg');
+                    icon.classList.toggle('text-red-500');
+                    if (icon.classList.contains('text-red-500')) {
+                        icon.classList.add('fill-red-500');
+                    } else {
+                        icon.classList.remove('fill-red-500');
+                    }
 
-            setTimeout(() => {
-                vibeHeart.style.opacity = '0';
-                vibeHeart.style.transform = 'translateY(-40px) scale(1.5)';
-            }, 50);
+                    // Floating effect
+                    const rect = btn.getBoundingClientRect();
+                    const vibeHeart = document.createElement('div');
+                    vibeHeart.className = 'fixed pointer-events-none transition-all duration-700 ease-out z-[100]';
+                    vibeHeart.style.left = `${rect.left + rect.width / 2}px`;
+                    vibeHeart.style.top = `${rect.top}px`;
+                    vibeHeart.innerHTML = '⚡';
+                    vibeHeart.style.fontSize = '20px';
+                    document.body.appendChild(vibeHeart);
 
-            setTimeout(() => vibeHeart.remove(), 700);
-        }
+                    setTimeout(() => {
+                        vibeHeart.style.opacity = '0';
+                        vibeHeart.style.transform = 'translateY(-40px) scale(1.5)';
+                    }, 50);
 
-        function initiateReply(author, btn) {
-            const root = document.getElementById('live-stream-root');
-            const alpineData = Alpine.find(root);
-            if (alpineData) {
-                alpineData.replyAuthor = author;
-                alpineData.replyingTo = Date.now(); // unique ID for mock
-                document.getElementById('chat-input').focus();
-            }
-        }
+                    setTimeout(() => vibeHeart.remove(), 700);
+                },
 
-        function sendReaction() {
-            const container = document.getElementById('reaction-container');
-            const heart = document.createElement('div');
-            const size = Math.random() * 20 + 20;
-            const left = Math.random() * 100;
+                sendReaction() {
+                    const container = document.getElementById('reaction-container');
+                    const heart = document.createElement('div');
+                    const size = Math.random() * 20 + 20;
+                    const left = Math.random() * 100;
 
-            heart.className = 'absolute bottom-0 text-red-500 transition-all duration-1000 ease-out pointer-events-none animate-bounce';
-            heart.style.left = `${left}%`;
-            heart.style.fontSize = `${size}px`;
-            heart.innerHTML = '❤️';
+                    heart.className = 'absolute bottom-0 text-red-500 transition-all duration-1000 ease-out pointer-events-none animate-bounce';
+                    heart.style.left = `${left}%`;
+                    heart.style.fontSize = `${size}px`;
 
-            container.appendChild(heart);
+                    heart.innerHTML = '<i data-lucide="heart" class="fill-current"></i>';
+                    setTimeout(() => lucide.createIcons(), 5);
 
-            // Animate Up and Fade
-            setTimeout(() => {
-                heart.style.bottom = '100%';
-                heart.style.opacity = '0';
-                heart.style.transform = `scale(${Math.random() * 2 + 1}) rotate(${Math.random() * 360}deg)`;
-            }, 50);
+                    container.appendChild(heart);
 
-            // Remove
-            setTimeout(() => heart.remove(), 1000);
-        }
+                    setTimeout(() => {
+                        heart.style.bottom = '100%';
+                        heart.style.opacity = '0';
+                        heart.style.transform = `scale(${Math.random() * 2 + 1}) rotate(${Math.random() * 360}deg)`;
+                    }, 50);
 
-        // Basic enter key support
-        document.getElementById('chat-input')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
+                    setTimeout(() => heart.remove(), 1000);
+                }
+            }));
         });
-
-        document.addEventListener("DOMContentLoaded", initCamera);
-        window.addEventListener('beforeunload', stopStream);
     </script>
 @endsection
