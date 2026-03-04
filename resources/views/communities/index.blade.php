@@ -62,7 +62,7 @@
                         <div
                             class="border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
                             <!-- Image -->
-                            <div class="h-32 sm:h-40 bg-gray-100 dark:bg-stone-800">
+                            <div class="h-32 sm:h-40 bg-stone-100 dark:bg-stone-800/50">
                                 @if($community->image)
                                     <img src="{{ asset('storage/' . $community->image) }}" alt="{{ $community->name }}"
                                         class="w-full h-full object-cover">
@@ -77,9 +77,11 @@
                             <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
                                 <div class="space-y-1.5 sm:space-y-2">
                                     <h2 class="text-base sm:text-lg font-semibold text-gray-800 dark:text-stone-100">
-                                        {{ $community->name }}</h2>
+                                        {{ $community->name }}
+                                    </h2>
                                     <p class="text-xs sm:text-sm text-gray-600 dark:text-stone-400 line-clamp-2">
-                                        {{ $community->description }}</p>
+                                        {{ $community->description }}
+                                    </p>
                                 </div>
 
                                 <!-- Stats -->
@@ -114,7 +116,7 @@
                                                 </form>
 
                                                 <a href="{{ route('communities.show', $community) }}"
-                                                    class="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 text-center rounded-lg text-xs sm:text-sm font-medium border border-amber-500 text-amber-600 hover:bg-amber-50">
+                                                    class="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 text-center rounded-lg text-xs sm:text-sm font-medium border border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20">
                                                     View
                                                 </a>
                                             </div>
@@ -138,32 +140,33 @@
                 </div>
 
                 <!-- Trending Communities -->
-                <div class="mt-8 sm:mt-12">
-                    <h2 class="text-base sm:text-xl font-bold text-gray-800 dark:text-stone-100 mb-3 sm:mb-4">Trending Among
-                        Friends</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                        @forelse ($trending as $i => $story)
-                            <div
-                                class="border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-lg p-4 sm:p-5 hover:shadow-md transition">
-                                <div class="flex items-center gap-2 sm:gap-3">
-                                    <span
-                                        class="text-lg sm:text-2xl font-bold text-stone-400 dark:text-stone-600">#{{ $i + 1 }}</span>
-                                    <div>
-                                        <h3 class="text-sm sm:text-base font-semibold text-gray-800 dark:text-stone-100">
-                                            {{ $story->title }}</h3>
-                                        <p class="text-xs sm:text-sm text-gray-500 dark:text-stone-500">
-                                            {{ $story->likes_count }} likes</p>
-                                    </div>
+                <h2 class="text-base sm:text-xl font-bold text-gray-800 dark:text-stone-100 mb-3 sm:mb-4">Recommended for
+                    You</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    @forelse ($trending as $i => $item)
+                        <a href="{{ route('communities.show', $item) }}"
+                            class="border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-lg p-4 sm:p-5 hover:shadow-md transition group">
+                            <div class="flex items-center gap-2 sm:gap-3">
+                                <span
+                                    class="text-lg sm:text-2xl font-bold text-stone-400 dark:text-stone-600 transition-colors group-hover:text-amber-500">#{{ $i + 1 }}</span>
+                                <div>
+                                    <h3
+                                        class="text-sm sm:text-base font-semibold text-gray-800 dark:text-stone-100 group-hover:text-amber-600">
+                                        {{ $item->name }}
+                                    </h3>
+                                    <p class="text-xs sm:text-sm text-gray-500 dark:text-stone-500">
+                                        {{ $item->members_count }} members
+                                    </p>
                                 </div>
                             </div>
-                        @empty
-                            <p class="text-gray-500 dark:text-stone-500 text-xs sm:text-sm">No trending stories among your
-                                friends yet.</p>
-                        @endforelse
-                    </div>
+                        </a>
+                    @empty
+                        <p class="text-stone-500 dark:text-stone-500 text-xs sm:text-sm">No trending communities yet.</p>
+                    @endforelse
                 </div>
-
             </div>
-        </main>
+
+    </div>
+    </main>
     </div>
 @endsection

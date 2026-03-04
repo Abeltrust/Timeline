@@ -11,8 +11,25 @@ class LiveStreamController extends Controller
 {
     public function index()
     {
-        $liveStreams = LiveStream::where('is_live', true)->latest()->get();
-        return view('live-streaming.index', compact('liveStreams'));
+        $liveStreams = LiveStream::where('is_live', true)
+            ->whereNull('completed_at')
+            ->latest()
+            ->get();
+
+        $upcomingStreams = LiveStream::whereNotNull('scheduled_at')
+            ->where('scheduled_at', '>', now())
+            ->whereNull('completed_at')
+            ->latest('scheduled_at')
+            ->get();
+
+        return view('live-streaming.index', compact('liveStreams', 'upcomingStreams'));
+    }
+
+    public function show(LiveStream $stream)
+    {
+        // Viewers enter the room. 
+        // A full implementation would check authorization, handle recording, etc.
+        return view('live-streaming.show', compact('stream'));
     }
 
     public function store(Request $request)
@@ -21,22 +38,41 @@ class LiveStreamController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category' => 'nullable|string|max:50',
+            'thumbnail' => 'nullable|image|max:2048',
+            'scheduled_at' => 'nullable|date|after_or_equal:now',
         ]);
+
+        $isScheduled = $request->filled('scheduled_at');
+
+        $thumbnailPath = null;
+        if ($request->hasFile('thumbnail')) {
+            $thumbnailPath = $request->file('thumbnail')->store('stream-thumbnails', 'public');
+        }
 
         $stream = LiveStream::create([
             'title' => $request->title,
             'description' => $request->description,
             'category' => $request->category,
             'user_id' => Auth::id(),
+            'thumbnail' => $thumbnailPath,
+            'scheduled_at' => $request->scheduled_at,
+            'is_live' => !$isScheduled, // If scheduled, it's not live yet.
         ]);
 
-        return redirect()->route('live-stream.index')->with('success', 'Live stream started!');
+        if ($isScheduled) {
+            return redirect()->route('live-stream.index')->with('success', 'Live stream scheduled successfully!');
+        }
+
+        return redirect()->route('live-stream.show', $stream)->with('success', 'You are now live!');
     }
 
     public function end(LiveStream $stream)
     {
-        $this->authorize('update', $stream); // Only host can end
+        if ($stream->user_id !== Auth::id()) {
+            abort(403);
+        }
         $stream->is_live = false;
+        $stream->completed_at = now();
         $stream->save();
 
         return redirect()->route('live-stream.index')->with('success', 'Live stream ended.');

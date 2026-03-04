@@ -11,39 +11,54 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter', 'all');
-        
-        $query = Event::with(['organizer', 'attendees'])
+
+        // 1. Regular Events Query
+        $eventQuery = Event::with(['organizer', 'attendees'])
             ->upcoming()
             ->latest('event_date');
+
+        // 2. Fetch Live Streams for the "Live Now" section
+        $liveStreams = \App\Models\LiveStream::where('is_live', true)
+            ->whereNull('completed_at')
+            ->with('host')
+            ->latest()
+            ->get();
+
+        // 3. Fetch Upcoming Streams for the "Upcoming Events" listing
+        $upcomingStreams = \App\Models\LiveStream::whereNotNull('scheduled_at')
+            ->where('scheduled_at', '>', now())
+            ->whereNull('completed_at')
+            ->with('host')
+            ->latest('scheduled_at')
+            ->get();
 
         switch ($filter) {
             case 'attending':
                 if (Auth::check()) {
-                    $query->whereHas('attendees', function($q) {
+                    $eventQuery->whereHas('attendees', function ($q) {
                         $q->where('user_id', Auth::id());
                     });
                 }
                 break;
             case 'hosting':
                 if (Auth::check()) {
-                    $query->where('organizer_id', Auth::id());
+                    $eventQuery->where('organizer_id', Auth::id());
                 }
                 break;
             case 'nearby':
-                // This would require location-based filtering
-                // For now, just show all events
+                // Location filtering mock
                 break;
         }
 
-        $events = $query->paginate(12);
-        
-        return view('events.index', compact('events', 'filter'));
+        $events = $eventQuery->paginate(12);
+
+        return view('events.index', compact('events', 'liveStreams', 'upcomingStreams', 'filter'));
     }
 
     public function show(Event $event)
     {
         $event->load(['organizer', 'attendees']);
-        
+
         return view('events.show', compact('event'));
     }
 
@@ -85,7 +100,7 @@ class EventController extends Controller
     public function join(Event $event)
     {
         $user = Auth::user();
-        
+
         if ($event->isFull()) {
             return response()->json(['error' => 'Event is full'], 400);
         }
@@ -114,7 +129,7 @@ class EventController extends Controller
     public function leave(Event $event)
     {
         $user = Auth::user();
-        
+
         $event->attendees()->detach($user->id);
         $event->decrement('attendees_count');
 

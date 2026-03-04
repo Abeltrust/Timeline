@@ -12,8 +12,8 @@ use App\Models\User;
 
 class CommunityController extends Controller
 {
-    
-        public function index(Request $request)
+
+    public function index(Request $request)
     {
         $filter = $request->get('filter', 'all');
         $search = $request->get('search');
@@ -25,7 +25,7 @@ class CommunityController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -44,40 +44,59 @@ class CommunityController extends Controller
 
         $communities = $query->paginate(12);
 
-        // ---- Trending logic ----
+        // ---- Trending logic: Communities with many members that friends belong to ----
         $trending = collect();
         if (Auth::check()) {
-            // get community IDs the user belongs to
-            $communityIds = Auth::user()->communities()->pluck('communities.id');
+            // Get IDs of communities the user is in
+            $myCommunityIds = Auth::user()->communities()->pluck('communities.id');
 
-            // get user IDs of members in those communities (the "network")
-            $networkUserIds = \DB::table('community_members')
-                ->whereIn('community_id', $communityIds)
+            // Get friends (users who are in the same communities)
+            $friendIds = \DB::table('community_members')
+                ->whereIn('community_id', $myCommunityIds)
+                ->where('user_id', '!=', Auth::id())
                 ->pluck('user_id')
                 ->unique();
 
-            // get trending posts from those users
-            $trending = \App\Models\Post::with('user')
-                ->withCount(['taps', 'resonances'])
-                ->whereIn('user_id', $networkUserIds)
-                ->orderByRaw('(taps_count + resonances_count) DESC')
-                ->latest()
-                ->take(5)
+            // Find communities these friends are in that the user is NOT in
+            $trending = Community::whereHas('members', function ($q) use ($friendIds) {
+                $q->whereIn('user_id', $friendIds);
+            })
+                ->whereDoesntHave('members', function ($q) {
+                    $q->where('user_id', Auth::id());
+                })
+                ->withCount('members')
+                ->orderBy('members_count', 'desc')
+                ->take(6)
                 ->get();
+
+            // Fallback: If no friend-based trends, just show most popular public ones
+            if ($trending->isEmpty()) {
+                $trending = Community::whereDoesntHave('members', function ($q) {
+                    $q->where('user_id', Auth::id());
+                })
+                    ->withCount('members')
+                    ->orderBy('members_count', 'desc')
+                    ->take(6)
+                    ->get();
+            }
         }
 
 
         $communities = $query->paginate(12);
-        
+
         return view('communities.index', compact('communities', 'filter', 'search', 'trending'));
     }
 
-   public function show(Community $community)
+    public function show(Community $community)
     {
         // Load related creator, members, and community posts
-        $community->load(['creator', 'members', 'communityPosts.user' => function($query) {
-            $query->latest()->limit(10);
-        }]);
+        $community->load([
+            'creator',
+            'members',
+            'communityPosts.user' => function ($query) {
+                $query->latest()->limit(10);
+            }
+        ]);
 
         // Fetch posts directly with pagination
         $posts = $community->communityPosts()
@@ -127,7 +146,7 @@ class CommunityController extends Controller
     public function join(Community $community)
     {
         $user = Auth::user();
-        
+
         if ($community->members()->where('user_id', $user->id)->exists()) {
             return response()->json(['error' => 'Already a member'], 400);
         }
@@ -135,16 +154,16 @@ class CommunityController extends Controller
         $community->members()->attach($user->id);
         $community->increment('members_count');
 
-        return response()->json(['success' => true]);
+        return redirect()->back()->with('success', "Joined {$community->name}!");
     }
 
     public function leave(Community $community)
     {
         $user = Auth::user();
-        
+
         $community->members()->detach($user->id);
         $community->decrement('members_count');
 
-        return response()->json(['success' => true]);
+        return redirect()->back()->with('success', "Left {$community->name}.");
     }
 }

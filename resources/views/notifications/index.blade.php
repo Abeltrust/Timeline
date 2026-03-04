@@ -25,7 +25,7 @@
             @foreach($filters as $key => $label)
                 <a href="{{ route('notifications.index', ['filter' => $key]) }}"
                     class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
-                        {{ $filter === $key ? 'bg-amber-500 text-white' : 'bg-gray-100 dark:bg-stone-800 text-gray-600 dark:text-stone-400 hover:bg-gray-200 dark:hover:bg-stone-700' }}">
+                                {{ $filter === $key ? 'bg-amber-500 text-white' : 'bg-gray-100 dark:bg-stone-800 text-gray-600 dark:text-stone-400 hover:bg-gray-200 dark:hover:bg-stone-700' }}">
                     {{ $label }}
                 </a>
             @endforeach
@@ -35,14 +35,14 @@
         <div class="space-y-3">
             @forelse($notifications as $notification)
                 <div
-                    class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 bg-white dark:bg-stone-900 rounded-xl border border-gray-100 dark:border-stone-800 shadow-sm hover:bg-gray-50 dark:hover:bg-stone-800/50 transition">
+                    class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 shadow-sm hover:bg-stone-50 dark:hover:bg-stone-800 transition">
 
                     <!-- LEFT SIDE -->
                     <div class="flex items-start gap-3">
                         <!-- AVATAR / ICON -->
                         <div
                             class="w-10 h-10 rounded-full flex items-center justify-center shrink-0
-                                {{ $notification->read ? 'bg-gray-200 dark:bg-stone-800 text-gray-500 dark:text-stone-500' : 'bg-amber-500 text-amber-600 dark:text-amber-100' }}">
+                                        {{ $notification->read ? 'bg-gray-200 dark:bg-stone-800 text-gray-500 dark:text-stone-500' : 'bg-amber-500 text-amber-600 dark:text-amber-100' }}">
                             <span class="font-bold text-sm">
                                 {{ strtoupper(substr($notification->fromUser->name ?? 'N/A', 0, 2)) }}
                             </span>
@@ -53,7 +53,7 @@
                             <p class="text-sm sm:text-base text-gray-800 dark:text-stone-200">
                                 {!! $notification->message !!}
                             </p>
-                            <p class="text-xs text-gray-500 dark:text-stone-500 mt-1">
+                            <p class="text-xs text-stone-500 dark:text-stone-500 mt-1">
                                 {{ $notification->created_at->diffForHumans() }}
                             </p>
                         </div>
@@ -73,7 +73,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-gray-500 dark:text-stone-500 text-center">No notifications found.</p>
+                <p class="text-stone-500 dark:text-stone-500 text-center">No notifications found.</p>
             @endforelse
         </div>
 

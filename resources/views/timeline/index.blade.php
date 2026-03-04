@@ -186,12 +186,12 @@
                                         class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-stone-600 hover:bg-stone-100">
                                         <i data-lucide="message-circle" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                                         <span class="font-medium"
-                                            data-resonance-count="{{ $post->id }}">{{ $post->resonances->count() }} </span>
+                                            data-resonance-count="{{ $post->id }}">{{ $post->resonances->count() }} Resonance</span>
                                     </button>
 
                                     <!-- Check-In -->
                                     <button onclick="toggleCheckin({{ $post->id }})" data-checkin-post="{{ $post->id }}"
-                                        class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-stone-600 hover:bg-stone-100">
+                                        class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition {{ auth()->user()->hasCheckedIn($post) ? 'text-green-600' : 'text-stone-600 hover:bg-stone-100' }}">
                                         <i data-lucide="check-circle" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                                         <span class="font-medium" data-checkin-count="{{ $post->id }}">
                                             {{ $post->check_ins_count }}
@@ -337,7 +337,7 @@
         function toggleTap(postId) {
             let btn = document.querySelector(`[data-tap-post="${postId}"]`);
             let countSpan = document.querySelector(`[data-tap-count="${postId}"]`);
-            let icon = btn.querySelector('i');
+            let icon = btn.querySelector('i, svg');
 
             // Optimistic UI update
             let isTapped = btn.classList.contains('text-red-600');

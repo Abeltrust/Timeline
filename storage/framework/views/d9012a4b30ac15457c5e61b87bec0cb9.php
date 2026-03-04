@@ -98,93 +98,81 @@
                 </div>
 
                 <!-- Cultures Grid (Refined Tile Style) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
                     <?php $__empty_1 = true; $__currentLoopData = $cultures; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $culture): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                        <div class="bg-white dark:bg-stone-900 rounded-[2.5rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.04)] border border-stone-100 dark:border-stone-800 group flex flex-col h-full transform transition-all duration-500 hover:shadow-[0_30px_70px_rgba(0,0,0,0.1)] hover:-translate-y-1">
+                        <div class="border border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col h-full group">
                             
-                            <!-- Image Section (Fixed Height for 3-Card Visibility) -->
-                            <div class="h-48 sm:h-56 relative overflow-hidden flex-shrink-0 m-3 rounded-[2rem]">
+                            <!-- Image Section -->
+                            <div class="h-40 relative overflow-hidden bg-stone-100 dark:bg-stone-800/50">
                                 <?php if($culture->image): ?>
-                                    <img src="<?php echo e(Storage::url($culture->image)); ?>" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                                    <img src="<?php echo e(Storage::url($culture->image)); ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                                 <?php else: ?>
-                                    <div class="w-full h-full bg-gradient-to-br from-amber-50 to-orange-50 dark:from-stone-800 dark:to-stone-900 flex items-center justify-center">
-                                        <i data-lucide="globe" class="w-10 h-10 text-amber-500/20"></i>
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <i data-lucide="globe" class="w-10 h-10 text-stone-300 dark:text-stone-700"></i>
                                     </div>
                                 <?php endif; ?>
-
-                                <!-- Submitter Overlay -->
-                                <div class="absolute bottom-4 left-4 flex items-center bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                                    <div class="w-3.5 h-3.5 rounded-full bg-amber-500 flex items-center justify-center mr-2 shadow-sm">
-                                        <i data-lucide="user" class="w-2 h-2 text-white"></i>
-                                    </div>
-                                    <span class="text-[9px] font-black text-white uppercase tracking-widest"><?php echo e($culture->submitter->name ?? 'Guardian'); ?></span>
+                                
+                                <!-- Category Badge -->
+                                <div class="absolute top-3 right-3 px-2 py-1 bg-black/50 backdrop-blur-md rounded-lg border border-white/10">
+                                    <span class="text-[9px] font-black text-white uppercase tracking-widest"><?php echo e($culture->category); ?></span>
                                 </div>
                             </div>
 
                             <!-- Content Info Body -->
-                            <div class="px-6 pt-2 pb-4 flex-1 flex flex-col">
-                                <div class="flex items-start justify-between mb-2">
-                                    <h3 class="font-bold text-stone-900 dark:text-white text-lg sm:text-xl lg:text-2xl leading-tight truncate pr-4">
+                            <div class="p-5 flex-1 flex flex-col justify-between">
+                                <div class="space-y-1">
+                                    <h3 class="font-bold text-stone-900 dark:text-stone-100 text-lg leading-tight truncate">
                                         <?php echo e($culture->name); ?>
 
                                     </h3>
-                                    
-                                    <!-- Integrated Top-Right Actions (Icons & Counts) -->
-                                    <div class="flex items-center space-x-3 pt-1">
-                                        <!-- Vibe (Resonance) Button -->
-                                        <?php if(auth()->guard()->check()): ?>
-                                            <button onclick="toggleCultureResonance(<?php echo e($culture->id); ?>)" 
-                                                    id="culture-vibe-btn-<?php echo e($culture->id); ?>"
-                                                    class="flex flex-col items-center group/vibe">
-                                                <i data-lucide="zap" 
-                                                   id="culture-vibe-icon-<?php echo e($culture->id); ?>"
-                                                   class="w-3.5 h-3.5 <?php echo e(auth()->user()->hasResonated($culture) ? 'text-orange-500 fill-orange-500' : 'text-stone-400 group-hover/vibe:text-orange-500'); ?> mb-0.5 transition-all"></i>
-                                                <span id="culture-vibe-count-<?php echo e($culture->id); ?>"
-                                                      class="text-[8px] font-black <?php echo e(auth()->user()->hasResonated($culture) ? 'text-orange-600' : 'text-stone-400'); ?> uppercase tracking-tighter"><?php echo e($culture->resonance_count); ?></span>
-                                            </button>
-                                        <?php else: ?>
-                                            <div class="flex flex-col items-center opacity-40">
-                                                <i data-lucide="zap" class="w-3.5 h-3.5 text-stone-400 mb-0.5"></i>
-                                                <span class="text-[8px] font-black text-stone-400 uppercase tracking-tighter"><?php echo e($culture->resonance_count); ?></span>
-                                            </div>
-                                        <?php endif; ?>
+                                    <p class="text-stone-600 dark:text-stone-400 text-sm truncate uppercase tracking-wider font-medium">
+                                        <?php echo e($culture->region); ?>
 
-                                        <!-- Lock-in Button -->
-                                        <?php if(auth()->guard()->check()): ?>
-                                            <button onclick="toggleCultureLockin(<?php echo e($culture->id); ?>)" 
-                                                    id="culture-lock-btn-<?php echo e($culture->id); ?>"
-                                                    class="flex flex-col items-center group/lock">
-                                                <i data-lucide="<?php echo e(auth()->user()->hasLockedIn($culture) ? 'check-circle' : 'lock'); ?>" 
-                                                   id="culture-lock-icon-<?php echo e($culture->id); ?>"
-                                                   class="w-3.5 h-3.5 <?php echo e(auth()->user()->hasLockedIn($culture) ? 'text-amber-500' : 'text-stone-400 group-hover/lock:text-amber-500'); ?> mb-0.5 transition-all"></i>
-                                                <span id="culture-lock-count-<?php echo e($culture->id); ?>"
-                                                      class="text-[8px] font-black <?php echo e(auth()->user()->hasLockedIn($culture) ? 'text-amber-600' : 'text-stone-400'); ?> uppercase tracking-tighter"><?php echo e($culture->locked_in_count); ?></span>
-                                            </button>
-                                        <?php else: ?>
-                                            <div class="flex flex-col items-center opacity-40">
-                                                <i data-lucide="lock" class="w-3.5 h-3.5 text-stone-400 mb-0.5"></i>
-                                                <span class="text-[8px] font-black text-stone-400 uppercase tracking-tighter"><?php echo e($culture->locked_in_count); ?></span>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
+                                    </p>
                                 </div>
 
-                                <p class="text-amber-600 dark:text-amber-500 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-3">
-                                    <?php echo e($culture->category); ?> • <?php echo e($culture->region); ?>
+                                <!-- Stats -->
+                                <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-stone-500 dark:text-stone-500 uppercase tracking-tight">
+                                    <span class="flex items-center gap-1.5" title="Resonance">
+                                        <i data-lucide="zap" 
+                                           id="culture-vibe-icon-<?php echo e($culture->id); ?>"
+                                           class="w-3.5 h-3.5 <?php echo e(auth()->check() && auth()->user()->hasResonated($culture) ? 'text-orange-500 fill-orange-500' : ''); ?>"></i>
+                                        <span id="culture-vibe-count-<?php echo e($culture->id); ?>"><?php echo e($culture->resonance_count); ?></span>
+                                    </span>
+                                    <span class="flex items-center gap-1.5" title="Lock-ins">
+                                        <i data-lucide="lock" 
+                                           id="culture-lock-icon-<?php echo e($culture->id); ?>"
+                                           class="w-3.5 h-3.5 <?php echo e(auth()->check() && auth()->user()->hasLockedIn($culture) ? 'text-amber-500' : ''); ?>"></i>
+                                        <span id="culture-lock-count-<?php echo e($culture->id); ?>"><?php echo e($culture->locked_in_count); ?></span>
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        <?php echo e($culture->created_at->diffForHumans(null, true)); ?>
 
-                                </p>
+                                    </span>
+                                </div>
 
-                                <p class="text-stone-500 dark:text-stone-400 text-[10px] sm:text-xs line-clamp-2 italic leading-relaxed mb-6 font-medium">
-                                    "<?php echo e($culture->description); ?>"
-                                </p>
+                                <!-- Action Buttons -->
+                                <div class="mt-4 flex gap-2">
+                                    <?php if(auth()->guard()->check()): ?>
+                                        <button onclick="toggleCultureLockin(<?php echo e($culture->id); ?>)" 
+                                                id="culture-lock-btn-<?php echo e($culture->id); ?>"
+                                                class="flex-1 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 transition shadow-sm active:scale-95">
+                                            <?php echo e(auth()->user()->hasLockedIn($culture) ? 'Locked-in' : 'Lock-in'); ?>
+
+                                        </button>
+                                    <?php else: ?>
+                                        <a href="<?php echo e(route('login')); ?>" class="flex-1 px-4 py-2.5 text-center rounded-xl text-xs font-black uppercase tracking-widest bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 transition shadow-sm">
+                                            Lock-in
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <a href="<?php echo e(route('cultural-hub.show', $culture->id)); ?>" 
+                                       class="flex-1 px-4 py-2.5 text-center rounded-xl text-xs font-black uppercase tracking-widest border border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition active:scale-95">
+                                        Explore
+                                    </a>
+                                </div>
                             </div>
-
-                            <!-- Full-Width Footer Action -->
-                            <a href="<?php echo e(route('cultural-hub.show', $culture->id)); ?>" 
-                               class="mx-6 mb-6 py-4 bg-stone-900 dark:bg-stone-800 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center hover:bg-amber-600 transition-all shadow-lg active:scale-95 group/btn">
-                                <span>Explore Story</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4 ml-3 group-hover/btn:translate-x-1 transition-transform"></i>
-                            </a>
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <!-- Empty state remains same -->

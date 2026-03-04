@@ -18,6 +18,14 @@ class LiveStream extends Model
         'category',
         'viewers_count',
         'is_live',
+        'scheduled_at',
+        'completed_at',
+    ];
+
+    protected $casts = [
+        'is_live' => 'boolean',
+        'scheduled_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     public function host()

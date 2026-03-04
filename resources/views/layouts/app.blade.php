@@ -31,7 +31,7 @@
 
         /* Standardized Input Styling */
         .stnd-input {
-            @apply rounded-xl border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder-stone-400;
+            @apply rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-100 focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder-stone-400 dark:placeholder-stone-500;
         }
     </style>
     
@@ -173,6 +173,7 @@
                         ['route' => 'events.index', 'icon' => 'calendar', 'label' => 'Events', 'tooltip' => 'Cultural events & meetups', 'auth' => true],
                         ['route' => 'profile.show', 'icon' => 'user', 'label' => 'My Story', 'tooltip' => 'Your life journey', 'auth' => true],
                         ['route' => 'vault.index', 'icon' => 'archive', 'label' => 'Vault', 'tooltip' => 'Private memories', 'auth' => true],
+                        ['route' => 'notifications.index', 'icon' => 'bell', 'label' => 'Notifications', 'tooltip' => 'Stay updated', 'auth' => true],
                         ['route' => 'messages.index', 'icon' => 'message-circle', 'label' => 'Messages', 'tooltip' => 'Connect with others', 'auth' => true],
                     ];
                     @endphp
@@ -258,7 +259,7 @@
     </div>
 
     <!-- Dynamic Reel Mobile Navigation (Double Gap Illusion) -->
-    @if(!request()->routeIs('messages.show'))
+    @if(!request()->routeIs('messages.show') && !request()->routeIs('live-stream.show'))
     <div class="fixed bottom-0 left-0 right-0 h-20 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 md:hidden z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] transition-colors duration-200">
         
         <!-- Fixed Center Post Button Anchor -->

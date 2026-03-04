@@ -117,6 +117,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/live-stream', [LiveStreamController::class, 'index'])->name('live-stream.index');
     Route::post('/live-stream', [LiveStreamController::class, 'store'])->name('live-stream.store');
+    Route::get('/live-stream/{stream}', [LiveStreamController::class, 'show'])->name('live-stream.show');
     Route::post('/live-stream/{stream}/end', [LiveStreamController::class, 'end'])->name('live-stream.end');
 
 });

@@ -294,12 +294,17 @@ class CulturalHubController extends Controller
         $image = null;
         $extension = strtolower($file->getClientOriginalExtension());
 
-        if ($extension === 'jpg' || $extension === 'jpeg') {
-            $image = imagecreatefromjpeg($file->getRealPath());
-        } elseif ($extension === 'png') {
-            $image = imagecreatefrompng($file->getRealPath());
-        } elseif ($extension === 'webp') {
-            $image = imagecreatefromwebp($file->getRealPath());
+        // Check if GD functions are available
+        $hasGD = function_exists('imagecreatefromjpeg');
+
+        if ($hasGD) {
+            if ($extension === 'jpg' || $extension === 'jpeg') {
+                $image = @imagecreatefromjpeg($file->getRealPath());
+            } elseif ($extension === 'png') {
+                $image = @imagecreatefrompng($file->getRealPath());
+            } elseif ($extension === 'webp') {
+                $image = @imagecreatefromwebp($file->getRealPath());
+            }
         }
 
         if ($image) {

@@ -25,7 +25,7 @@
             <?php $__currentLoopData = $filters; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <a href="<?php echo e(route('notifications.index', ['filter' => $key])); ?>"
                     class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors
-                        <?php echo e($filter === $key ? 'bg-amber-500 text-white' : 'bg-gray-100 dark:bg-stone-800 text-gray-600 dark:text-stone-400 hover:bg-gray-200 dark:hover:bg-stone-700'); ?>">
+                                <?php echo e($filter === $key ? 'bg-amber-500 text-white' : 'bg-gray-100 dark:bg-stone-800 text-gray-600 dark:text-stone-400 hover:bg-gray-200 dark:hover:bg-stone-700'); ?>">
                     <?php echo e($label); ?>
 
                 </a>
@@ -36,14 +36,14 @@
         <div class="space-y-3">
             <?php $__empty_1 = true; $__currentLoopData = $notifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div
-                    class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 bg-white dark:bg-stone-900 rounded-xl border border-gray-100 dark:border-stone-800 shadow-sm hover:bg-gray-50 dark:hover:bg-stone-800/50 transition">
+                    class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 shadow-sm hover:bg-stone-50 dark:hover:bg-stone-800 transition">
 
                     <!-- LEFT SIDE -->
                     <div class="flex items-start gap-3">
                         <!-- AVATAR / ICON -->
                         <div
                             class="w-10 h-10 rounded-full flex items-center justify-center shrink-0
-                                <?php echo e($notification->read ? 'bg-gray-200 dark:bg-stone-800 text-gray-500 dark:text-stone-500' : 'bg-amber-500 text-amber-600 dark:text-amber-100'); ?>">
+                                        <?php echo e($notification->read ? 'bg-gray-200 dark:bg-stone-800 text-gray-500 dark:text-stone-500' : 'bg-amber-500 text-amber-600 dark:text-amber-100'); ?>">
                             <span class="font-bold text-sm">
                                 <?php echo e(strtoupper(substr($notification->fromUser->name ?? 'N/A', 0, 2))); ?>
 
@@ -56,7 +56,7 @@
                                 <?php echo $notification->message; ?>
 
                             </p>
-                            <p class="text-xs text-gray-500 dark:text-stone-500 mt-1">
+                            <p class="text-xs text-stone-500 dark:text-stone-500 mt-1">
                                 <?php echo e($notification->created_at->diffForHumans()); ?>
 
                             </p>
@@ -77,7 +77,7 @@
                     </div>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <p class="text-gray-500 dark:text-stone-500 text-center">No notifications found.</p>
+                <p class="text-stone-500 dark:text-stone-500 text-center">No notifications found.</p>
             <?php endif; ?>
         </div>
 
