@@ -247,21 +247,29 @@
     </div>
 
     <!-- Dynamic Reel Mobile Navigation (Double Gap Illusion) -->
+    <?php if(!request()->routeIs('messages.show')): ?>
     <div class="fixed bottom-0 left-0 right-0 h-20 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 md:hidden z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] transition-colors duration-200">
         
         <!-- Fixed Center Post Button Anchor -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="w-[20vw] flex items-center justify-center">
                 <?php if(auth()->guard()->check()): ?>
-                <button onclick="openCreatePostModal()" 
-                    class="pointer-events-auto flex flex-col items-center justify-center -mt-10 bg-gradient-to-tr from-amber-500 to-orange-600 w-16 h-16 rounded-full shadow-lg border-4 border-white dark:border-stone-900 text-white transform active:scale-95 transition-all z-[60]">
-                    <i data-lucide="plus" class="w-8 h-8"></i>
-                </button>
+                    <?php if(request()->routeIs('cultural-hub.index')): ?>
+                        <a href="<?php echo e(route('cultural-hub.create')); ?>" 
+                           class="pointer-events-auto flex flex-col items-center justify-center -mt-10 bg-gradient-to-tr from-amber-500 to-orange-600 w-16 h-16 rounded-full shadow-lg border-4 border-white dark:border-stone-900 text-white transform active:scale-95 transition-all z-[60]">
+                            <i data-lucide="plus" class="w-8 h-8"></i>
+                        </a>
+                    <?php else: ?>
+                        <button onclick="openCreatePostModal()" 
+                            class="pointer-events-auto flex flex-col items-center justify-center -mt-10 bg-gradient-to-tr from-amber-500 to-orange-600 w-16 h-16 rounded-full shadow-lg border-4 border-white dark:border-stone-900 text-white transform active:scale-95 transition-all z-[60]">
+                            <i data-lucide="plus" class="w-8 h-8"></i>
+                        </button>
+                    <?php endif; ?>
                 <?php else: ?>
-                <a href="<?php echo e(route('login')); ?>" class="pointer-events-auto flex flex-col items-center justify-center text-stone-600 dark:text-stone-400">
-                    <i data-lucide="log-in" class="w-7 h-7"></i>
-                    <span class="text-[11px] mt-1 font-bold uppercase tracking-tighter">Login</span>
-                </a>
+                    <a href="<?php echo e(route('login')); ?>" class="pointer-events-auto flex flex-col items-center justify-center text-stone-600 dark:text-stone-400">
+                        <i data-lucide="log-in" class="w-7 h-7"></i>
+                        <span class="text-[11px] mt-1 font-bold uppercase tracking-tighter">Login</span>
+                    </a>
                 <?php endif; ?>
             </div>
         </div>
@@ -294,6 +302,7 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Create Post Modal -->
     <?php if(auth()->guard()->check()): ?>

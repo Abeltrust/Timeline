@@ -143,6 +143,15 @@ class User extends Authenticatable
             ->exists();
     }
 
+    public function hasResonated($model)
+    {
+        return $this->interactions()
+            ->where('interactable_type', get_class($model))
+            ->where('interactable_id', $model->id)
+            ->where('type', 'resonance')
+            ->exists();
+    }
+
     public function getInitialsAttribute()
     {
         $names = explode(' ', $this->name);

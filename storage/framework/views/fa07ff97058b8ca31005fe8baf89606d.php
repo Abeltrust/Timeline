@@ -52,31 +52,31 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
                                 <input type="text" name="name" value="<?php echo e(Auth::user()->name); ?>"
-                                    class="w-full border rounded-lg p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700">
+                                    class="w-full stnd-input p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
                                 <input type="text" name="username" value="<?php echo e(Auth::user()->username); ?>"
-                                    class="w-full border rounded-lg p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700">
+                                    class="w-full stnd-input p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
                             <textarea name="bio" rows="3"
-                                class="w-full border rounded-lg p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700"><?php echo e(Auth::user()->bio); ?></textarea>
+                                class="w-full stnd-input p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700"><?php echo e(Auth::user()->bio); ?></textarea>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
                                 <input type="text" name="location" value="<?php echo e(Auth::user()->location); ?>"
-                                    class="w-full border rounded-lg p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700">
+                                    class="w-full stnd-input p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Website</label>
                                 <input type="url" name="website" value="<?php echo e(Auth::user()->website); ?>"
-                                    class="w-full border rounded-lg p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700">
+                                    class="w-full stnd-input p-2 mt-1 dark:bg-stone-900 dark:text-gray-100 dark:border-stone-700">
                             </div>
                         </div>
 

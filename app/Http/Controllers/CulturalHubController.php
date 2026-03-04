@@ -34,7 +34,7 @@ class CulturalHubController extends Controller
             $query->where('category', $category);
         }
 
-        $cultures = $query->inRandomOrder()->paginate(12);
+        $cultures = $query->inRandomOrder()->paginate(18);
 
         $categories = [
             'all' => 'All Cultures',
@@ -372,6 +372,47 @@ class CulturalHubController extends Controller
         return response()->json([
             'lockedIn' => $lockedIn,
             'count' => $culture->fresh()->locked_in_count,
+        ]);
+    }
+
+    public function resonance(Culture $culture)
+    {
+        $user = Auth::user();
+
+        $interaction = $user->interactions()
+            ->where('interactable_type', Culture::class)
+            ->where('interactable_id', $culture->id)
+            ->where('type', 'resonance')
+            ->first();
+
+        if ($interaction) {
+            $interaction->delete();
+            $culture->decrement('resonance_count');
+            $resonated = false;
+        } else {
+            $user->interactions()->create([
+                'interactable_type' => Culture::class,
+                'interactable_id' => $culture->id,
+                'type' => 'resonance',
+            ]);
+            $culture->increment('resonance_count');
+            $resonated = true;
+
+            // Create notification
+            if ($culture->submitted_by !== $user->id) {
+                $culture->submitter->notifications()->create([
+                    'from_user_id' => $user->id,
+                    'type' => 'resonance',
+                    'title' => 'New Resonance',
+                    'message' => $user->name . ' resonated with ' . $culture->name,
+                    'data' => ['culture_id' => $culture->id],
+                ]);
+            }
+        }
+
+        return response()->json([
+            'resonated' => $resonated,
+            'count' => $culture->fresh()->resonance_count,
         ]);
     }
 }
