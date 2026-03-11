@@ -80,10 +80,9 @@ class CommunityPostController extends Controller
             'parent_id' => 'nullable|exists:comments,id'
         ]);
 
-        Comment::create([
-            'community_post_id' => $post->id,
+        $post->comments()->create([
             'user_id' => Auth::id(),
-            'body' => $request->body,
+            'content' => $request->body,
             'parent_id' => $request->parent_id,
         ]);
 
@@ -102,5 +101,52 @@ class CommunityPostController extends Controller
         $comment->delete();
 
         return back()->with('success', 'Comment deleted.');
+    }
+
+    /**
+     * Store a new comment via AJAX.
+     */
+    public function commentAjax(Request $request, CommunityPost $post)
+    {
+        $request->validate([
+            'content' => 'required|string|max:2000',
+            'parent_id' => 'nullable|exists:comments,id'
+        ]);
+
+        $comment = $post->comments()->create([
+            'user_id' => Auth::id(),
+            'content' => $request->content,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'content' => $comment->content,
+            'user' => [
+                'name' => Auth::user()->name,
+                'profile_photo_url' => Auth::user()->getProfilePhotoUrlAttribute(),
+            ]
+        ]);
+    }
+
+    /**
+     * Tap a community post via AJAX.
+     */
+    public function tap(Request $request, CommunityPost $post)
+    {
+        $tap = $post->taps()->where('user_id', Auth::id())->first();
+
+        if ($tap) {
+            $tap->delete();
+            $tapped = false;
+        } else {
+            $post->taps()->create(['user_id' => Auth::id()]);
+            $tapped = true;
+        }
+
+        return response()->json([
+            'tapped' => $tapped,
+            'count' => $post->taps()->count()
+        ]);
     }
 }

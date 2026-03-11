@@ -54,7 +54,7 @@
 
         <!-- CHAT MESSAGES (scrollable) -->
         <div id="chat-messages"
-            class="flex-1 overflow-y-auto p-2 md:p-6 space-y-4 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5 dark:bg-opacity-[0.02] dark:invert">
+            class="flex-1 overflow-y-auto p-2 md:p-6 space-y-4 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5 dark:bg-opacity-[0.02]">
             <?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $msg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div class="flex <?php echo e($msg->user_id == auth()->id() ? 'justify-end' : 'justify-start'); ?>">
                     <div

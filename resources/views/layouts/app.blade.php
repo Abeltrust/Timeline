@@ -79,7 +79,9 @@
         }
     </script>
 </head>
-<body class="h-full bg-stone-50 dark:bg-stone-900 antialiased text-stone-800 dark:text-gray-100">
+<body class="h-full bg-stone-50 dark:bg-stone-900 antialiased text-stone-800 dark:text-gray-100"
+      x-data="{ pageLoading: true }" 
+      x-init="window.addEventListener('load', () => pageLoading = false); window.addEventListener('beforeunload', () => pageLoading = true)">
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 h-16 bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm border-b border-stone-200 dark:border-stone-800 z-50 flex transition-colors duration-200">
         <div class="w-full flex items-center h-full px-4 md:px-6 gap-4">
@@ -240,8 +242,35 @@
 
 
         <!-- Main Content -->
-        <main class="flex-1 pt-16 md:ml-20 {{ (request()->routeIs('messages.*')) ? 'pb-0' : 'pb-16' }} md:pb-0">
-            @yield('content')
+        <main class="flex-1 pt-16 md:ml-20 {{ (request()->routeIs('messages.*')) ? 'pb-0' : 'pb-16' }} md:pb-0 min-h-screen relative">
+            
+            <!-- Global Skeleton Loader -->
+            <div x-show="pageLoading" 
+                 x-transition.opacity.duration.200ms
+                 class="absolute inset-0 z-40 bg-stone-50 dark:bg-stone-900 p-4 sm:p-6 lg:p-8">
+                <div class="max-w-7xl mx-auto animate-pulse space-y-8">
+                    <!-- Header Skeleton -->
+                    <div class="flex items-center justify-between">
+                        <div class="w-1/3 lg:w-1/4 h-10 bg-stone-200 dark:bg-stone-800 rounded-xl"></div>
+                        <div class="w-1/4 h-10 bg-stone-200 dark:bg-stone-800 rounded-xl hidden sm:block"></div>
+                    </div>
+                    
+                    <!-- Content Skeleton -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="h-72 bg-stone-200 dark:bg-stone-800 rounded-3xl"></div>
+                        <div class="h-72 bg-stone-200 dark:bg-stone-800 rounded-3xl"></div>
+                        <div class="h-72 bg-stone-200 dark:bg-stone-800 rounded-3xl hidden lg:block"></div>
+                        <div class="h-72 bg-stone-200 dark:bg-stone-800 rounded-3xl hidden lg:block"></div>
+                        <div class="h-72 bg-stone-200 dark:bg-stone-800 rounded-3xl hidden lg:block"></div>
+                        <div class="h-72 bg-stone-200 dark:bg-stone-800 rounded-3xl hidden lg:block"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div x-show="!pageLoading" x-cloak x-transition.opacity.duration.300ms>
+                @yield('content')
+            </div>
         </main>
     </div>
 

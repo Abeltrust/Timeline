@@ -42,6 +42,12 @@ class Community extends Model
         return $this->hasMany(Post::class);
     }
 
+    // Community events
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
     // Community-specific posts
     public function communityPosts()
     {

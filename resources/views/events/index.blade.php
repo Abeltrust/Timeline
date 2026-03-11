@@ -87,7 +87,7 @@
 
             {{-- Unified Results Grid --}}
             @if ($events->count() || $upcomingStreams->count())
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
                     {{-- Integrated Upcoming Streams --}}
                     @foreach ($upcomingStreams as $stream)

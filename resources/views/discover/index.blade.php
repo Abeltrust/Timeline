@@ -44,7 +44,7 @@
         </div>
 
         <!-- Data Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             @forelse ($data as $item)
                 @if ($tab === 'stories')
                     <div class="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl shadow-sm overflow-hidden border border-stone-200 dark:border-stone-800">

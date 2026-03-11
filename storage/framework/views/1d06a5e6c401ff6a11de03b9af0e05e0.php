@@ -27,7 +27,9 @@
                 </button>
             </div>
 
-            <form action="<?php echo e(route('live-stream.store')); ?>" method="POST" enctype="multipart/form-data">
+        <?php echo $__env->make('partials.image-compression', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            <form action="<?php echo e(route('live-stream.store')); ?>" method="POST" enctype="multipart/form-data"
+                @submit.prevent="if(await handleFormImageCompression($el)) $el.submit()">
                 <?php echo csrf_field(); ?>
 
                 <div class="space-y-4">

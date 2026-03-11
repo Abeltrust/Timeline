@@ -57,7 +57,7 @@
                 </div>
 
                 <!-- Communities Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-5 sm:mt-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-5 sm:mt-6">
                     @forelse ($communities as $community)
                         <div
                             class="border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">

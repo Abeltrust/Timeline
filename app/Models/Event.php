@@ -23,6 +23,7 @@ class Event extends Model
         'meeting_link',
         'requirements',
         'organizer_id',
+        'community_id',
     ];
 
     protected $casts = [
@@ -42,6 +43,11 @@ class Event extends Model
     public function attendees()
     {
         return $this->belongsToMany(User::class, 'event_attendees');
+    }
+
+    public function community()
+    {
+        return $this->belongsTo(Community::class);
     }
 
     // Scopes

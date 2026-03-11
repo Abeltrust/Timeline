@@ -62,9 +62,10 @@ class EventController extends Controller
         return view('events.show', compact('event'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('events.create');
+        $community_id = $request->query('community_id');
+        return view('events.create', compact('community_id'));
     }
 
     public function store(Request $request)
@@ -82,16 +83,23 @@ class EventController extends Controller
             'meeting_link' => 'nullable|url',
             'requirements' => 'nullable|array',
             'image' => 'nullable|image|max:10240',
+            'community_id' => 'nullable|exists:communities,id',
         ]);
 
         $event = new Event($request->all());
         $event->organizer_id = Auth::id();
+        $event->price = $request->input('price', 0) ?: 0;
 
         if ($request->hasFile('image')) {
             $event->image = $request->file('image')->store('events', 'public');
         }
 
         $event->save();
+
+        if ($event->community_id) {
+            return redirect()->route('communities.show', $event->community_id)
+                ->with('success', 'Community event created successfully!');
+        }
 
         return redirect()->route('events.index')
             ->with('success', 'Event created successfully!');
@@ -102,11 +110,11 @@ class EventController extends Controller
         $user = Auth::user();
 
         if ($event->isFull()) {
-            return response()->json(['error' => 'Event is full'], 400);
+            return back()->with('error', 'This event is already at full capacity.');
         }
 
         if ($event->attendees()->where('user_id', $user->id)->exists()) {
-            return response()->json(['error' => 'Already registered'], 400);
+            return back()->with('error', 'You are already registered for this event.');
         }
 
         $event->attendees()->attach($user->id);
@@ -123,7 +131,7 @@ class EventController extends Controller
             ]);
         }
 
-        return response()->json(['success' => true]);
+        return back()->with('success', 'You have successfully registered for ' . $event->title . '!');
     }
 
     public function leave(Event $event)
@@ -133,6 +141,6 @@ class EventController extends Controller
         $event->attendees()->detach($user->id);
         $event->decrement('attendees_count');
 
-        return response()->json(['success' => true]);
+        return back()->with('success', 'You have successfully cancelled your registration.');
     }
 }

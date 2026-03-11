@@ -257,7 +257,7 @@
                         if (data.error) {
                             console.error(data.error);
                             return;
-                        }
+                             }
                         // Just refresh the entire page so the user can immediately see the new restricted layout / get message access
                         window.location.reload();
                     })

@@ -96,6 +96,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/communities/{community}/posts', [CommunityPostController::class, 'store'])->name('communities.posts.store');
     Route::put('/communities/{community}/posts/{post}', [CommunityPostController::class, 'update'])->name('communities.posts.update');
     Route::delete('/communities/{community}/posts/{post}', [CommunityPostController::class, 'destroy'])->name('communities.posts.destroy');
+    Route::post('/community-posts/{post}/tap', [CommunityPostController::class, 'tap'])->name('community-posts.tap');
+    Route::post('/community-posts/{post}/comment', [CommunityPostController::class, 'commentAjax'])->name('community-posts.comment.ajax');
 
     //comment
     Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');

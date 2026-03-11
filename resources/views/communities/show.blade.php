@@ -4,8 +4,17 @@
 @section('content')
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {{-- Left Column: Post Form + Feed --}}
+        {{-- Left Column: Main Content Area --}}
         <div class="lg:col-span-2 space-y-6">
+
+            {{-- Tabs --}}
+            <div class="flex gap-4 border-b border-stone-200 dark:border-stone-800 pb-2">
+                <button onclick="switchCommunityTab('feed')" id="tab-feed" class="px-4 py-2 text-sm sm:text-base font-semibold border-b-2 border-amber-500 text-amber-600 dark:text-amber-500 transition">Feed</button>
+                <button onclick="switchCommunityTab('meetings')" id="tab-meetings" class="px-4 py-2 text-sm sm:text-base font-semibold border-b-2 border-transparent text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition">Meetings / Lectures</button>
+            </div>
+
+            {{-- Feed Section --}}
+            <div id="section-feed" class="space-y-6 block">
 
             {{-- Post Form --}}
             @auth
@@ -73,15 +82,17 @@
 
                         {{-- Post Content --}}
                         <p
-                            class="mt-2 text-sm sm:text-base text-stone-700 dark:text-stone-300 leading-relaxed whitespace-pre-wrap">
+                            class="mt-2 text-sm sm:text-base text-stone-700 dark:text-stone-300 leading-relaxed whitespace-pre-wrap text-left">
                             {{ $post->content }}
                         </p>
 
                         {{-- Media --}}
                         <div class="mt-3 flex flex-col gap-4">
                             @if($post->image)
-                                <img src="{{ asset('storage/' . $post->image) }}"
-                                    class="rounded-xl w-full object-cover max-h-96 sm:max-h-[28rem]" alt="post image">
+                                <div class="w-full bg-stone-50 dark:bg-stone-800/50 rounded-xl overflow-hidden flex items-center justify-center border border-stone-100 dark:border-stone-800">
+                                    <img src="{{ asset('storage/' . $post->image) }}"
+                                        class="w-full h-auto max-h-[32rem] object-contain" alt="post image">
+                                </div>
                             @endif
                             @if($post->video)
                                 <video controls class="rounded-xl w-full max-h-96 sm:max-h-[28rem]">
@@ -101,9 +112,9 @@
                             @auth
                                 <button title="Tap" data-tap-post="{{ $post->id }}"
                                     onclick="toggleCommunityTap({{ $post->id }}, this)"
-                                    class="flex items-center gap-2 px-3 py-1 rounded-full text-sm transition {{ $post->taps()->where('user_id', auth()->id())->exists() ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400' : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800' }}">
+                                    class="flex items-center gap-2 px-3 py-1 rounded-full text-sm transition-all transform active:scale-95 {{ $post->taps()->where('user_id', auth()->id())->exists() ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400' : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800' }}">
                                     <i data-lucide="heart"
-                                        class="w-5 h-5 {{ $post->taps()->where('user_id', auth()->id())->exists() ? 'fill-current' : '' }}"></i>
+                                        class="w-5 h-5 transition-transform duration-300 {{ $post->taps()->where('user_id', auth()->id())->exists() ? 'fill-current scale-110' : 'scale-100' }}"></i>
                                     <span id="tap-count-{{ $post->id }}"
                                         class="text-sm font-medium">{{ $post->taps()->count() }}</span>
                                 </button>
@@ -138,22 +149,48 @@
 
                         {{-- Comments Box --}}
                         <div id="comments-box-{{ $post->id }}" class="hidden mt-3 space-y-3">
-                            @foreach($post->comments()->latest()->limit(50)->get() as $comment)
+                            @foreach($post->comments()->whereNull('parent_id')->latest()->limit(50)->get() as $comment)
                                 <div class="flex gap-3 items-start">
                                     <img src="{{ $comment->user->profile_photo_url }}" class="w-9 h-9 rounded-full object-cover">
-                                    <div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-4 flex-1">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <p class="text-sm font-medium text-stone-800 dark:text-stone-100">
-                                                    {{ $comment->user->name }}</p>
-                                                <p class="text-xs text-stone-400 dark:text-stone-500">
-                                                    {{ $comment->created_at->diffForHumans() }}</p>
+                                    <div class="flex-1 space-y-2">
+                                        <div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-4">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <p class="text-sm font-medium text-stone-800 dark:text-stone-100">{{ $comment->user->name }}</p>
+                                                    <p class="text-xs text-stone-400 dark:text-stone-500">{{ $comment->created_at->diffForHumans() }}</p>
+                                                </div>
+                                            </div>
+                                            <p class="mt-2 text-sm text-stone-700 dark:text-stone-300">{{ $comment->content }}</p>
+                                            <div class="mt-2 text-xs text-stone-500 flex gap-3">
+                                                <button onclick="toggleReplyBox({{ $comment->id }})" class="hover:text-amber-600">Reply</button>
                                             </div>
                                         </div>
-                                        <p class="mt-2 text-sm text-stone-700 dark:text-stone-300">{{ $comment->content }}</p>
-                                        <div class="mt-2 text-xs text-stone-500 flex gap-3">
-                                            <button onclick="replyComment({{ $comment->id }})"
-                                                class="hover:text-amber-600">Reply</button>
+
+                                        {{-- Reply Form --}}
+                                        @auth
+                                            <form id="reply-form-{{ $comment->id }}" class="hidden flex gap-2" onsubmit="submitReply(event, {{ $post->id }}, {{ $comment->id }})">
+                                                @csrf
+                                                <input type="text" id="reply-input-{{ $comment->id }}" placeholder="Write a reply..." class="flex-1 px-3 py-2 text-sm rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:ring-2 focus:ring-amber-300 transition-all outline-none">
+                                                <button type="submit" class="px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm"><i data-lucide="send" class="w-4 h-4"></i></button>
+                                            </form>
+                                        @endauth
+
+                                        {{-- Replies --}}
+                                        <div id="replies-box-{{ $comment->id }}" class="space-y-2 pl-4 border-l-2 border-stone-100 dark:border-stone-800 mt-2">
+                                            @foreach($comment->replies()->oldest()->get() as $reply)
+                                                <div class="flex gap-3 items-start">
+                                                    <img src="{{ $reply->user->profile_photo_url }}" class="w-7 h-7 rounded-full object-cover">
+                                                    <div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-3 flex-1">
+                                                        <div class="flex items-center justify-between">
+                                                            <div>
+                                                                <p class="text-sm font-medium text-stone-800 dark:text-stone-100">{{ $reply->user->name }}</p>
+                                                                <p class="text-xs text-stone-400 dark:text-stone-500">{{ $reply->created_at->diffForHumans() }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <p class="mt-1 text-sm text-stone-700 dark:text-stone-300">{{ $reply->content }}</p>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
                                 </div>
@@ -188,6 +225,54 @@
             {{-- Pagination --}}
             <div class="mt-6">
                 {{ $posts->links() }}
+            </div>
+            
+            </div> {{-- End of Feed Section --}}
+
+            {{-- Meetings Section --}}
+            <div id="section-meetings" class="hidden space-y-6">
+                <div class="flex items-center justify-between bg-white dark:bg-stone-900 rounded-2xl shadow-md border border-stone-100 dark:border-stone-800 p-5">
+                    <div>
+                        <h3 class="text-lg font-bold text-stone-800 dark:text-stone-100">Community Meetings</h3>
+                        <p class="text-sm text-stone-500 dark:text-stone-400">Host and join live lectures or gatherings.</p>
+                    </div>
+                    @auth
+                        <a href="{{ route('events.create', ['community_id' => $community->id]) }}" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm sm:text-base font-semibold shadow-sm hover:from-amber-600 hover:to-orange-700 transition">
+                            Create Meeting
+                        </a>
+                    @endauth
+                </div>
+
+                <div class="space-y-4">
+                    @forelse($community->events()->upcoming()->get() as $event)
+                        <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-800 p-4 flex flex-col sm:flex-row gap-4">
+                            @if($event->image)
+                                <img src="{{ asset('storage/' . $event->image) }}" class="w-full sm:w-32 h-32 object-cover rounded-xl shrink-0" alt="{{ $event->title }}">
+                            @else
+                                <div class="w-full sm:w-32 h-32 bg-stone-100 dark:bg-stone-800 rounded-xl flex items-center justify-center shrink-0">
+                                    <i data-lucide="calendar" class="w-8 h-8 text-stone-400"></i>
+                                </div>
+                            @endif
+                            <div class="flex-1">
+                                <h4 class="text-lg font-bold text-stone-800 dark:text-stone-100">{{ $event->title }}</h4>
+                                <p class="text-sm text-stone-600 dark:text-stone-400 mt-1">{{ Str::limit($event->description, 100) }}</p>
+                                <div class="mt-3 flex flex-wrap gap-3 text-xs font-medium text-stone-500">
+                                    <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> {{ $event->event_date->format('M d, Y') }} at {{ $event->event_time->format('H:i') }}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> {{ $event->is_online ? 'Online' : $event->location }}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="users" class="w-4 h-4"></i> {{ $event->attendees_count }} / {{ $event->max_attendees ?: '∞' }} attending</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col justify-end">
+                                <a href="{{ route('events.show', $event) }}" class="px-4 py-2 border border-stone-200 dark:border-stone-700 rounded-xl text-sm text-stone-800 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition text-center text-nowrap">View Event</a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-10 bg-white dark:bg-stone-900 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-800">
+                            <i data-lucide="calendar-x" class="w-12 h-12 text-stone-300 mx-auto mb-3"></i>
+                            <p class="text-stone-500">No upcoming meetings in this community.</p>
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
 
@@ -265,13 +350,30 @@
         function toggleCommentsBox(postId) { document.getElementById(`comments-box-${postId}`).classList.toggle("hidden"); }
 
         function toggleCommunityTap(postId, btn) {
+            if(btn.disabled) return;
             btn.disabled = true;
+            
+            // Interaction animation feedback
+            const icon = btn.querySelector('i');
+            icon.classList.add('scale-125');
+            setTimeout(() => icon.classList.remove('scale-125'), 150);
+
             fetch(`/community-posts/${postId}/tap`, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
                 .then(res => res.json()).then(data => {
                     const countEl = document.getElementById(`tap-count-${postId}`);
                     if (countEl) countEl.textContent = data.count;
-                    if (data.tapped) { btn.classList.add('bg-red-50', 'text-red-600'); btn.querySelector('i').classList.add('fill-current'); }
-                    else { btn.classList.remove('bg-red-50', 'text-red-600'); btn.querySelector('i').classList.remove('fill-current'); }
+                    if (data.tapped) { 
+                        btn.classList.add('bg-red-50', 'text-red-600', 'dark:bg-red-900/20', 'dark:text-red-400');
+                        btn.classList.remove('text-stone-600', 'dark:text-stone-400', 'hover:bg-stone-50', 'dark:hover:bg-stone-800');
+                        icon.classList.add('fill-current', 'scale-110');
+                        icon.classList.remove('scale-100');
+                    }
+                    else { 
+                        btn.classList.remove('bg-red-50', 'text-red-600', 'dark:bg-red-900/20', 'dark:text-red-400');
+                        btn.classList.add('text-stone-600', 'dark:text-stone-400', 'hover:bg-stone-50', 'dark:hover:bg-stone-800');
+                        icon.classList.remove('fill-current', 'scale-110');
+                        icon.classList.add('scale-100');
+                    }
                 }).finally(() => btn.disabled = false);
         }
 
@@ -321,6 +423,57 @@
             }
         }
 
-        function replyComment(commentId) { alert('Reply feature coming soon for comment ' + commentId); }
+        function toggleReplyBox(commentId) { 
+            const box = document.getElementById(`reply-form-${commentId}`);
+            if(box) box.classList.toggle('hidden'); 
+        }
+
+        function submitReply(e, postId, parentId) {
+            e.preventDefault();
+            const input = document.getElementById(`reply-input-${parentId}`);
+            const content = input.value.trim();
+            if (!content) return;
+            input.disabled = true;
+
+            fetch(`/community-posts/${postId}/comment`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ content, parent_id: parentId })
+            }).then(res => res.json()).then(data => {
+                const repliesBox = document.getElementById(`replies-box-${parentId}`);
+                const newReply = document.createElement('div');
+                newReply.className = 'flex gap-3 items-start';
+                newReply.innerHTML = `
+                    <img src="${data.user.profile_photo_url || '/images/default-avatar.png'}" class="w-7 h-7 rounded-full object-cover">
+                    <div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-3 flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-stone-800 dark:text-stone-100">${data.user.name}</p>
+                                <p class="text-xs text-stone-400 dark:text-stone-500">Just now</p>
+                            </div>
+                        </div>
+                        <p class="mt-1 text-sm text-stone-700 dark:text-stone-300">${data.content}</p>
+                    </div>
+                `;
+                repliesBox.appendChild(newReply);
+                document.getElementById(`comment-count-${postId}`).textContent = parseInt(document.getElementById(`comment-count-${postId}`).textContent) + 1;
+                input.value = '';
+                toggleReplyBox(parentId);
+            }).finally(() => input.disabled = false);
+        }
+
+        function switchCommunityTab(tab) {
+            document.getElementById('section-feed').classList.add('hidden');
+            document.getElementById('section-meetings').classList.add('hidden');
+            
+            document.getElementById('tab-feed').classList.remove('border-amber-500', 'text-amber-600', 'dark:text-amber-500');
+            document.getElementById('tab-feed').classList.add('border-transparent', 'text-stone-500');
+            document.getElementById('tab-meetings').classList.remove('border-amber-500', 'text-amber-600', 'dark:text-amber-500');
+            document.getElementById('tab-meetings').classList.add('border-transparent', 'text-stone-500');
+
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.remove('border-transparent', 'text-stone-500');
+            document.getElementById(`tab-${tab}`).classList.add('border-amber-500', 'text-amber-600', 'dark:text-amber-500');
+        }
     </script>
 @endsection

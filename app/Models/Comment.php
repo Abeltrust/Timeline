@@ -9,12 +9,7 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['community_post_id', 'user_id', 'content', 'parent_id'];
-
-    public function post()
-    {
-        return $this->belongsTo(CommunityPost::class, 'community_post_id');
-    }
+    protected $fillable = ['commentable_id', 'commentable_type', 'user_id', 'content', 'parent_id'];
 
     public function user()
     {
