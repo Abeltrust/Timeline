@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -76,7 +77,7 @@ class EventController extends Controller
             'event_date' => 'required|date|after:today',
             'event_time' => 'required',
             'location' => 'required|string|max:255',
-            'type' => 'required|in:workshop,conference,cultural,exhibition',
+            'type' => 'required|string|max:50', // More flexible types for Educational Hub
             'max_attendees' => 'nullable|integer|min:1',
             'price' => 'nullable|numeric|min:0',
             'is_online' => 'boolean',
@@ -84,11 +85,13 @@ class EventController extends Controller
             'requirements' => 'nullable|array',
             'image' => 'nullable|image|max:10240',
             'community_id' => 'nullable|exists:communities,id',
+            'accepts_contributions' => 'boolean',
         ]);
 
-        $event = new Event($request->all());
+        $event = new Event($request->except('image'));
         $event->organizer_id = Auth::id();
         $event->price = $request->input('price', 0) ?: 0;
+        $event->accepts_contributions = $request->boolean('accepts_contributions');
 
         if ($request->hasFile('image')) {
             $event->image = $request->file('image')->store('events', 'public');
@@ -142,5 +145,81 @@ class EventController extends Controller
         $event->decrement('attendees_count');
 
         return back()->with('success', 'You have successfully cancelled your registration.');
+    }
+
+    /**
+     * Mock Ticket Purchase Logic
+     */
+    public function purchaseTicket(Request $request, Event $event)
+    {
+        if ($event->price <= 0) {
+            return $this->join($event);
+        }
+
+        $user = Auth::user();
+
+        // 1. Create Transaction (Mocking successful payment)
+        $transaction = \App\Models\Transaction::create([
+            'user_id' => $user->id,
+            'event_id' => $event->id,
+            'host_id' => $event->organizer_id,
+            'amount' => $event->price,
+            'type' => 'ticket',
+            'status' => 'completed', // Mocking success
+            'reference' => 'TKT-' . strtoupper(Str::random(10)),
+        ]);
+
+        // 2. Add as Attendee
+        $event->attendees()->attach($user->id);
+        $event->increment('attendees_count');
+
+        // 3. Notify Organizer
+        $event->organizer->notifications()->create([
+            'from_user_id' => $user->id,
+            'type' => 'event',
+            'title' => 'New Ticket Purchased',
+            'message' => $user->name . ' bought a ticket for ' . $event->title,
+            'data' => ['event_id' => $event->id, 'transaction_id' => $transaction->id],
+        ]);
+
+        return back()->with('success', 'Ticket purchased successfully! See you at ' . $event->title);
+    }
+
+    /**
+     * Mock Contribution Logic
+     */
+    public function sendContribution(Request $request, Event $event)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        if (!$event->accepts_contributions) {
+            return back()->with('error', 'This event is not accepting contributions.');
+        }
+
+        $user = Auth::user();
+
+        // 1. Create Transaction
+        $transaction = \App\Models\Transaction::create([
+            'user_id' => $user->id,
+            'event_id' => $event->id,
+            'host_id' => $event->organizer_id,
+            'amount' => $request->amount,
+            'type' => 'contribution',
+            'status' => 'completed',
+            'reference' => 'CON-' . strtoupper(Str::random(10)),
+        ]);
+
+        // 2. Notify Organizer
+        $event->organizer->notifications()->create([
+            'from_user_id' => $user->id,
+            'type' => 'event',
+            'title' => 'New Contribution Received',
+            'message' => $user->name . ' sent a contribution of $' . $request->amount . ' for ' . $event->title,
+            'data' => ['event_id' => $event->id, 'transaction_id' => $transaction->id],
+        ]);
+
+        return back()->with('success', 'Thank you for your generous contribution!');
     }
 }

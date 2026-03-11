@@ -103,6 +103,16 @@ class User extends Authenticatable
         return $this->hasMany(Message::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function transactionsReceived()
+    {
+        return $this->hasMany(Transaction::class, 'host_id');
+    }
+
     public function userRelationships()
     {
         return $this->hasMany(UserRelationship::class);

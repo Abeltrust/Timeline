@@ -173,6 +173,7 @@
                         ['route' => 'cultural-hub.index', 'icon' => 'globe', 'label' => 'Cultural Hub', 'tooltip' => 'Explore global heritage'],
                         ['route' => 'communities.index', 'icon' => 'users', 'label' => 'Communities', 'tooltip' => 'Join cultural groups', 'auth' => true],
                         ['route' => 'events.index', 'icon' => 'calendar', 'label' => 'Events', 'tooltip' => 'Cultural events & meetups', 'auth' => true],
+                        ['route' => 'education.index', 'icon' => 'graduation-cap', 'label' => 'Edu Hub', 'tooltip' => 'Classes, rituals & trainings'],
                         ['route' => 'profile.show', 'icon' => 'user', 'label' => 'My Story', 'tooltip' => 'Your life journey', 'auth' => true],
                         ['route' => 'vault.index', 'icon' => 'archive', 'label' => 'Vault', 'tooltip' => 'Private memories', 'auth' => true],
                         ['route' => 'notifications.index', 'icon' => 'bell', 'label' => 'Notifications', 'tooltip' => 'Stay updated', 'auth' => true],
@@ -323,6 +324,7 @@
                     ['route' => 'discover.index', 'icon' => 'compass', 'label' => 'Search'],
                     ['type' => 'gap'], // Alignment for Slide 1
                     ['route' => 'cultural-hub.index', 'icon' => 'globe', 'label' => 'Hub'],
+                    ['route' => 'education.index', 'icon' => 'graduation-cap', 'label' => 'Edu'],
                     ['route' => 'messages.index', 'icon' => 'message-circle', 'label' => 'Chat'],
                     ['type' => 'gap'], // Alignment for Slide 2
                      ['route' => 'communities.index', 'icon' => 'users', 'label' => 'Communities'],

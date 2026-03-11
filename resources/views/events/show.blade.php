@@ -154,16 +154,18 @@
                 <div class="space-y-3 pt-2">
                     @auth
                         @if($event->organizer_id == auth()->id())
-                            <button disabled class="w-full py-4 bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 font-bold rounded-xl cursor-not-allowed text-center uppercase tracking-wider text-sm">
-                                You are the Organizer
-                            </button>
+                            <div class="bg-stone-100 dark:bg-stone-800 p-4 rounded-xl text-center">
+                                <p class="text-xs uppercase font-black text-stone-400 tracking-widest mb-1">Host Controls</p>
+                                <p class="text-stone-600 dark:text-stone-300 font-bold">You are the Organizer</p>
+                            </div>
                         @elseif($event->attendees->contains(auth()->id()))
                             <div class="text-center">
-                                <button disabled class="w-full py-4 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800 font-bold rounded-xl mb-3 flex items-center justify-center gap-2">
-                                    <i data-lucide="check-circle" class="w-5 h-5"></i> You're Attending
-                                </button>
-                                <form action="{{ route('events.leave', $event) }}" method="POST" class="inline">
-                                    @csrf
+                                <div class="w-full py-4 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800 font-bold rounded-xl mb-3 flex items-center justify-center gap-2">
+                                    <i data-lucide="check-circle" class="w-5 h-5"></i> 
+                                    {{ $event->price > 0 ? 'Ticket Active' : "You're Attending" }}
+                                </div>
+                                <form action="{{ route('events.leave', $event) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel? Refunds are handled by the host.')">
+                                    @csrf @method('DELETE')
                                     <button type="submit" class="text-xs text-stone-500 hover:text-red-500 transition underline underline-offset-2">Cancel Registration</button>
                                 </form>
                             </div>
@@ -173,17 +175,21 @@
                                     <i data-lucide="slash" class="w-4 h-4"></i> Event is Full
                                 </button>
                             @else
-                                <form action="{{ route('events.join', $event) }}" method="POST">
+                                <form action="{{ $event->price > 0 ? route('events.ticket', $event) : route('events.join', $event) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-amber-500/30 transition-all font-black rounded-xl text-center uppercase tracking-widest active:scale-95 flex items-center justify-center gap-2">
-                                        Register Now <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        {{ $event->price > 0 ? 'Buy Ticket' : 'Register Now' }} 
+                                        <i data-lucide="{{ $event->price > 0 ? 'credit-card' : 'arrow-right' }}" class="w-4 h-4"></i>
                                     </button>
                                 </form>
+                                @if($event->price > 0)
+                                    <p class="text-[10px] text-center text-stone-400 font-bold uppercase tracking-tight mt-2">Secure Ticketing Powered by Timeline Education</p>
+                                @endif
                             @endif
                         @endif
                     @else
                         <a href="{{ route('login') }}" class="block w-full py-4 bg-stone-800 dark:bg-stone-100 hover:bg-stone-900 dark:hover:bg-white text-white dark:text-stone-900 transition-all font-bold rounded-xl text-center uppercase tracking-widest text-sm text-nowrap">
-                            Log in to Register
+                            Log in to Join
                         </a>
                     @endauth
 
@@ -195,6 +201,31 @@
                         @endif
                     </p>
                 </div>
+
+                {{-- Contribution Section --}}
+                @if($event->accepts_contributions)
+                <div class="mt-8 bg-amber-50 dark:bg-amber-900/10 rounded-2xl p-6 border border-amber-100 dark:border-amber-900/30">
+                    <h4 class="text-sm font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <i data-lucide="heart" class="w-4 h-4"></i> Support Educator
+                    </h4>
+                    <p class="text-xs text-amber-900/60 dark:text-amber-500/60 mb-4 leading-relaxed">
+                        The organizer is open to financial contributions to support this work. Every bit helps preserve our traditions.
+                    </p>
+                    
+                    <form action="{{ route('events.contribute', $event) }}" method="POST" class="space-y-3">
+                        @csrf
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-600 dark:text-amber-500 font-bold">$</span>
+                            <input type="number" name="amount" min="1" step="1" required
+                                class="w-full bg-white dark:bg-stone-800 border-amber-200 dark:border-amber-900/50 rounded-xl pl-7 pr-4 py-2 text-sm focus:ring-amber-500 focus:border-amber-500 dark:text-stone-100"
+                                placeholder="Amount">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-black text-xs uppercase tracking-widest rounded-xl transition shadow-sm">
+                            Send Contribution
+                        </button>
+                    </form>
+                </div>
+                @endif
             </div>
             
         </div>

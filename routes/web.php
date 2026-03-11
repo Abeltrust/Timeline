@@ -13,6 +13,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\DiscoverController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LiveStreamController;
+use App\Http\Controllers\EducationalHubController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,6 +24,7 @@ use Inertia\Inertia;
 Route::get('/', [TimelineController::class, 'index'])->name('timeline.index');
 Route::get('/cultural-hub', [CulturalHubController::class, 'index'])->name('cultural-hub.index');
 Route::get('/discover', [DiscoverController::class, 'index'])->name('discover.index');
+Route::get('/education', [EducationalHubController::class, 'index'])->name('education.index');
 
 
 //  Auth routes
@@ -88,6 +90,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('events', EventController::class);
     Route::post('/events/{event}/join', [EventController::class, 'join'])->name('events.join');
     Route::delete('/events/{event}/leave', [EventController::class, 'leave'])->name('events.leave');
+    Route::post('/events/{event}/ticket', [EventController::class, 'purchaseTicket'])->name('events.ticket');
+    Route::post('/events/{event}/contribute', [EventController::class, 'sendContribution'])->name('events.contribute');
 
     // Communities
     Route::resource('communities', CommunityController::class);

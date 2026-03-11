@@ -24,6 +24,7 @@ class Event extends Model
         'requirements',
         'organizer_id',
         'community_id',
+        'accepts_contributions',
     ];
 
     protected $casts = [
@@ -48,6 +49,11 @@ class Event extends Model
     public function community()
     {
         return $this->belongsTo(Community::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 
     // Scopes

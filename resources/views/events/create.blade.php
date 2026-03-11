@@ -51,12 +51,21 @@
 
       <!-- Type -->
       <div>
-        <label for="type" class="block text-gray-700 dark:text-stone-300 font-semibold mb-2">Event Type</label>
+        <label for="type" class="block text-gray-700 dark:text-stone-300 font-semibold mb-2">Event/Category Type</label>
         <select name="type" id="type" class="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:outline-none" required>
-            <option value="workshop">Workshop</option>
-            <option value="conference">Conference</option>
-            <option value="cultural" selected>Cultural Gathering</option>
-            <option value="exhibition">Exhibition</option>
+            <optgroup label="Educational Hub">
+                <option value="class">Class / Lesson</option>
+                <option value="training">Training Program</option>
+                <option value="workshop" selected>Workshop</option>
+                <option value="ritual">Traditional Ritual</option>
+                <option value="ceremony">Ceremony</option>
+            </optgroup>
+            <optgroup label="Social & Community">
+                <option value="wedding">Wedding / Rights</option>
+                <option value="cultural">Cultural Gathering</option>
+                <option value="exhibition">Exhibition</option>
+                <option value="conference">Conference</option>
+            </optgroup>
         </select>
         @error('type')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
       </div>
@@ -95,13 +104,30 @@
             @error('max_attendees')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
           </div>
 
-          <!-- Price -->
+          <!-- Price / Ticketing -->
           <div>
-            <label for="price" class="block text-gray-700 dark:text-stone-300 font-semibold mb-2">Price ($) (Optional)</label>
-            <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0" value="0"
-              class="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="0.00 (Free)">
+            <label for="price" class="block text-gray-700 dark:text-stone-300 font-semibold mb-2">Ticket Price ($)</label>
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 font-bold">$</span>
+                <input type="number" name="price" id="price" value="{{ old('price', 0) }}" step="0.01" min="0"
+                  class="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl pl-8 pr-4 py-3 focus:ring-2 focus:ring-amber-500 focus:outline-none text-lg font-bold" placeholder="0.00 (Free)">
+            </div>
+            <p class="text-[10px] text-stone-500 mt-1 uppercase font-bold tracking-tight">Set to 0.00 for free registration</p>
             @error('price')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
           </div>
+      </div>
+
+      <!-- Contributions Toggle -->
+      <div class="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-2xl p-6">
+        <label class="flex items-center gap-4 cursor-pointer">
+            <input type="hidden" name="accepts_contributions" value="0">
+            <input type="checkbox" name="accepts_contributions" value="1" {{ old('accepts_contributions') ? 'checked' : '' }}
+                class="w-6 h-6 rounded-lg border-stone-300 text-amber-500 focus:ring-amber-500">
+            <div>
+                <span class="block text-stone-900 dark:text-stone-100 font-black text-lg">Accept Financial Contributions</span>
+                <span class="block text-stone-600 dark:text-stone-400 text-sm">Allow attendees and viewers to send voluntary donations to support this {{ isset($community_id) ? 'meeting' : 'event' }}.</span>
+            </div>
+        </label>
       </div>
 
       <!-- Upload Image -->

@@ -130,8 +130,14 @@
                                 <div class="h-48 w-full overflow-hidden relative">
                                     <img src="{{ asset('storage/' . $event->image) }}"
                                         class="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                    <span
-                                        class="absolute top-4 right-4 bg-white/90 dark:bg-stone-900/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800">{{ $event->type }}</span>
+                                    <div class="absolute top-4 right-4 flex flex-col items-end gap-2">
+                                        <span class="bg-white/90 dark:bg-stone-900/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800">{{ $event->type }}</span>
+                                        @if($event->price > 0)
+                                            <span class="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase border border-amber-400 shadow-lg shadow-amber-500/20">${{ number_format($event->price, 2) }}</span>
+                                        @else
+                                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase border border-green-400 shadow-lg shadow-green-500/20">Free</span>
+                                        @endif
+                                    </div>
                                 </div>
                             @endif
 
