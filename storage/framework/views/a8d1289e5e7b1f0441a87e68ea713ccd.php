@@ -1,1 +1,0 @@
-<?php /**PATH C:\Timeline\resources\views/cultural-hub/steps/help.blade.php ENDPATH**/ ?>

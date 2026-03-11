@@ -256,9 +256,9 @@
 
     <!-- Share Modal -->
     <div id="shareModal"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-3 sm:p-0">
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-3 sm:p-0 animate-backdrop-fade">
         <div
-            class="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-md p-4 sm:p-6 relative text-xs sm:text-sm border dark:border-stone-800">
+            class="animate-modal-pop-up bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-md p-4 sm:p-6 relative text-xs sm:text-sm border dark:border-stone-800">
             <!-- Close Button -->
             <button onclick="closeShareModal()"
                 class="absolute top-2 right-2 sm:top-3 sm:right-3 text-gray-500 hover:text-gray-700">

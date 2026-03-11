@@ -17,6 +17,19 @@ class TimelineController extends Controller
             ->public()
             ->latest();
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('content', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('chapter', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%")
+                         ->orWhere('username', 'like', "%{$search}%");
+                  });
+            });
+        }
+
         if (Auth::check()) {
             if (!$request->has('filter')) {
                 $filter = 'lockedin';
