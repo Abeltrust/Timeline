@@ -31,16 +31,44 @@
 
         /* Standardized Input Styling */
         .stnd-input {
-            @apply rounded-xl border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder-stone-400;
+            @apply rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-100 focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder-stone-400 dark:placeholder-stone-500;
+        }
+
+        /* Modal Animations */
+        @keyframes modal-pop-up {
+            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal-pop-up {
+            animation: modal-pop-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes backdrop-fade {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-backdrop-fade {
+            animation: backdrop-fade 0.3s ease-out forwards;
         }
     </style>
     
     <script>
         // FOUC Prevention Script
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        const savedTheme = <?php echo json_encode(auth()->check() ? (auth()->user()->preferences['theme'] ?? null) : null, 15, 512) ?>;
+        const localTheme = localStorage.getItem('theme');
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        
+        const theme = savedTheme || localTheme || systemTheme;
+        
+        if (theme === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
+        }
+        
+        // Sync local storage if it differs from backend
+        if (savedTheme && savedTheme !== localTheme) {
+            localStorage.setItem('theme', savedTheme);
         }
     </script>
     
@@ -85,11 +113,17 @@
             <!-- Center: Search Bar (Hidden on Mobile) -->
             <?php if(auth()->guard()->check()): ?>
             <div class="hidden md:flex flex-1 max-w-2xl mx-auto items-center">
-                <div class="relative w-full">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-stone-400"></i>
-                    <input type="text" placeholder="Search..." 
-                           class="w-full pl-10 pr-4 py-2 stnd-input bg-stone-100 focus:bg-white transition-all duration-200 text-sm">
-                </div>
+                <form action="<?php echo e(route('timeline.index')); ?>" method="GET" class="relative w-full group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="w-4 h-4 text-stone-400 group-focus-within:text-amber-500 transition-colors"></i>
+                    </div>
+                    <input type="text" 
+                           name="search" 
+                           value="<?php echo e(request('search')); ?>"
+                           placeholder="Search stories, traditions, legacy..." 
+                           class="w-full pl-11 pr-4 py-2.5 bg-stone-100/50 dark:bg-stone-800/50 backdrop-blur-md border border-stone-200 dark:border-stone-700 rounded-2xl text-sm font-bold placeholder:text-stone-400 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white dark:focus:bg-stone-900 transition-all duration-300 shadow-sm text-stone-800 dark:text-stone-100">
+                    <button type="submit" class="hidden"></button>
+                </form>
             </div>
             <?php endif; ?>
 
@@ -162,6 +196,7 @@
                         ['route' => 'events.index', 'icon' => 'calendar', 'label' => 'Events', 'tooltip' => 'Cultural events & meetups', 'auth' => true],
                         ['route' => 'profile.show', 'icon' => 'user', 'label' => 'My Story', 'tooltip' => 'Your life journey', 'auth' => true],
                         ['route' => 'vault.index', 'icon' => 'archive', 'label' => 'Vault', 'tooltip' => 'Private memories', 'auth' => true],
+                        ['route' => 'notifications.index', 'icon' => 'bell', 'label' => 'Notifications', 'tooltip' => 'Stay updated', 'auth' => true],
                         ['route' => 'messages.index', 'icon' => 'message-circle', 'label' => 'Messages', 'tooltip' => 'Connect with others', 'auth' => true],
                     ];
                     ?>
@@ -247,21 +282,29 @@
     </div>
 
     <!-- Dynamic Reel Mobile Navigation (Double Gap Illusion) -->
+    <?php if(!request()->routeIs('messages.show') && !request()->routeIs('live-stream.show')): ?>
     <div class="fixed bottom-0 left-0 right-0 h-20 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 md:hidden z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] transition-colors duration-200">
         
         <!-- Fixed Center Post Button Anchor -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="w-[20vw] flex items-center justify-center">
                 <?php if(auth()->guard()->check()): ?>
-                <button onclick="openCreatePostModal()" 
-                    class="pointer-events-auto flex flex-col items-center justify-center -mt-10 bg-gradient-to-tr from-amber-500 to-orange-600 w-16 h-16 rounded-full shadow-lg border-4 border-white dark:border-stone-900 text-white transform active:scale-95 transition-all z-[60]">
-                    <i data-lucide="plus" class="w-8 h-8"></i>
-                </button>
+                    <?php if(request()->routeIs('cultural-hub.index')): ?>
+                        <a href="<?php echo e(route('cultural-hub.create')); ?>" 
+                           class="pointer-events-auto flex flex-col items-center justify-center -mt-10 bg-gradient-to-tr from-amber-500 to-orange-600 w-16 h-16 rounded-full shadow-lg border-4 border-white dark:border-stone-900 text-white transform active:scale-95 transition-all z-[60]">
+                            <i data-lucide="plus" class="w-8 h-8"></i>
+                        </a>
+                    <?php else: ?>
+                        <button onclick="openCreatePostModal()" 
+                            class="pointer-events-auto flex flex-col items-center justify-center -mt-10 bg-gradient-to-tr from-amber-500 to-orange-600 w-16 h-16 rounded-full shadow-lg border-4 border-white dark:border-stone-900 text-white transform active:scale-95 transition-all z-[60]">
+                            <i data-lucide="plus" class="w-8 h-8"></i>
+                        </button>
+                    <?php endif; ?>
                 <?php else: ?>
-                <a href="<?php echo e(route('login')); ?>" class="pointer-events-auto flex flex-col items-center justify-center text-stone-600 dark:text-stone-400">
-                    <i data-lucide="log-in" class="w-7 h-7"></i>
-                    <span class="text-[11px] mt-1 font-bold uppercase tracking-tighter">Login</span>
-                </a>
+                    <a href="<?php echo e(route('login')); ?>" class="pointer-events-auto flex flex-col items-center justify-center text-stone-600 dark:text-stone-400">
+                        <i data-lucide="log-in" class="w-7 h-7"></i>
+                        <span class="text-[11px] mt-1 font-bold uppercase tracking-tighter">Login</span>
+                    </a>
                 <?php endif; ?>
             </div>
         </div>
@@ -276,9 +319,12 @@
                     ['route' => 'cultural-hub.index', 'icon' => 'globe', 'label' => 'Hub'],
                     ['route' => 'messages.index', 'icon' => 'message-circle', 'label' => 'Chat'],
                     ['type' => 'gap'], // Alignment for Slide 2
+                     ['route' => 'communities.index', 'icon' => 'users', 'label' => 'Communities'],
+                    ['route' => 'notifications.index', 'icon' => 'bell', 'label' => 'Alerts'],
+                    ['type' => 'gap'], // Alignment for Slide 3
                     ['route' => 'events.index', 'icon' => 'calendar', 'label' => 'Events'],
                     ['route' => 'profile.show', 'icon' => 'user', 'label' => 'Profile'],
-                ];
+                    ];
             ?>
 
             <?php $__currentLoopData = $reelItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -294,11 +340,13 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Create Post Modal -->
     <?php if(auth()->guard()->check()): ?>
-    <div id="createPostModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white dark:bg-stone-900 rounded-none md:rounded-2xl w-[95%] sm:w-[90%] md:w-full h-[90vh] md:h-auto md:max-w-2xl md:max-h-[90vh] overflow-y-auto mx-auto shadow-lg">
+    <?php echo $__env->make('partials.image-compression', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <div id="createPostModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4 animate-backdrop-fade">
+        <div class="animate-modal-pop-up bg-white dark:bg-stone-900 rounded-none md:rounded-2xl w-[95%] sm:w-[90%] md:w-full h-[90vh] md:h-auto md:max-w-2xl md:max-h-[90vh] overflow-y-auto mx-auto shadow-lg">
         <!-- Header -->
         <div class="sticky top-0 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 p-3 md:p-4 flex items-center justify-between">
             <h3 class="text-base md:text-lg font-bold text-stone-800 dark:text-stone-100">Share Your Story</h3>
@@ -308,7 +356,9 @@
         </div>
 
         <!-- Form -->
-        <form action="<?php echo e(route('timeline.store')); ?>" method="POST" enctype="multipart/form-data" class="p-4 md:p-6 space-y-4 text-sm md:text-base">
+        <form action="<?php echo e(route('timeline.store')); ?>" method="POST" enctype="multipart/form-data" 
+              @submit.prevent="if(await handleFormImageCompression($el)) $el.submit()"
+              class="p-4 md:p-6 space-y-4 text-sm md:text-base">
             <?php echo csrf_field(); ?>
 
             <!-- User Info -->
