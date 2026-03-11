@@ -33,6 +33,23 @@
         .stnd-input {
             @apply rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-100 focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder-stone-400 dark:placeholder-stone-500;
         }
+
+        /* Modal Animations */
+        @keyframes modal-pop-up {
+            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal-pop-up {
+            animation: modal-pop-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes backdrop-fade {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-backdrop-fade {
+            animation: backdrop-fade 0.3s ease-out forwards;
+        }
     </style>
     
     <script>
@@ -96,11 +113,17 @@
             <!-- Center: Search Bar (Hidden on Mobile) -->
             @auth
             <div class="hidden md:flex flex-1 max-w-2xl mx-auto items-center">
-                <div class="relative w-full">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-stone-400"></i>
-                    <input type="text" placeholder="Search..." 
-                           class="w-full pl-10 pr-4 py-2 stnd-input bg-stone-100 focus:bg-white transition-all duration-200 text-sm">
-                </div>
+                <form action="{{ route('timeline.index') }}" method="GET" class="relative w-full group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="w-4 h-4 text-stone-400 group-focus-within:text-amber-500 transition-colors"></i>
+                    </div>
+                    <input type="text" 
+                           name="search" 
+                           value="{{ request('search') }}"
+                           placeholder="Search stories, traditions, legacy..." 
+                           class="w-full pl-11 pr-4 py-2.5 bg-stone-100/50 dark:bg-stone-800/50 backdrop-blur-md border border-stone-200 dark:border-stone-700 rounded-2xl text-sm font-bold placeholder:text-stone-400 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white dark:focus:bg-stone-900 transition-all duration-300 shadow-sm text-stone-800 dark:text-stone-100">
+                    <button type="submit" class="hidden"></button>
+                </form>
             </div>
             @endauth
 
@@ -322,8 +345,8 @@
     <!-- Create Post Modal -->
     @auth
     @include('partials.image-compression')
-    <div id="createPostModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white dark:bg-stone-900 rounded-none md:rounded-2xl w-[95%] sm:w-[90%] md:w-full h-[90vh] md:h-auto md:max-w-2xl md:max-h-[90vh] overflow-y-auto mx-auto shadow-lg">
+    <div id="createPostModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4 animate-backdrop-fade">
+        <div class="animate-modal-pop-up bg-white dark:bg-stone-900 rounded-none md:rounded-2xl w-[95%] sm:w-[90%] md:w-full h-[90vh] md:h-auto md:max-w-2xl md:max-h-[90vh] overflow-y-auto mx-auto shadow-lg">
         <!-- Header -->
         <div class="sticky top-0 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 p-3 md:p-4 flex items-center justify-between">
             <h3 class="text-base md:text-lg font-bold text-stone-800 dark:text-stone-100">Share Your Story</h3>
